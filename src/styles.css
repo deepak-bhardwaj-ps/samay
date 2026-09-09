@@ -1,0 +1,313 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using the
+ * approved Samay palette.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Tiro Devanagari Sanskrit", "Inter", ui-serif, Georgia, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Vedic mandala palette extensions */
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-ochre: var(--ochre);
+  --color-ochre-foreground: var(--ochre-foreground);
+  --color-saffron: var(--saffron);
+  --color-saffron-foreground: var(--saffron-foreground);
+  --color-indigo: var(--indigo);
+  --color-indigo-foreground: var(--indigo-foreground);
+  --color-cream: var(--cream);
+  --color-cream-foreground: var(--cream-foreground);
+  --color-day: var(--day);
+  --color-night: var(--night);
+  --color-neutral: var(--neutral);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  --background: #0b142e;
+  --foreground: #e7e4e2;
+  --card: #0b182b;
+  --card-foreground: #e7e4e2;
+  --popover: #0b182b;
+  --popover-foreground: #e7e4e2;
+  --primary: #f1bc62;
+  --primary-foreground: #0b142e;
+  --secondary: #32568a;
+  --secondary-foreground: #e7e4e2;
+  --muted: #32568a;
+  --muted-foreground: #e7e4e2;
+  --accent: #32568a;
+  --accent-foreground: #e7e4e2;
+  --destructive: #e7e4e2;
+  --destructive-foreground: #0b142e;
+  --border: rgb(231 228 226 / 25%);
+  --input: rgb(231 228 226 / 30%);
+  --ring: #f1bc62;
+  --chart-1: #f1bc62;
+  --chart-2: #32568a;
+  --chart-3: #e7e4e2;
+  --chart-4: #0b182b;
+  --chart-5: #0b142e;
+  --sidebar: #0b182b;
+  --sidebar-foreground: #e7e4e2;
+  --sidebar-primary: #f1bc62;
+  --sidebar-primary-foreground: #0b142e;
+  --sidebar-accent: #32568a;
+  --sidebar-accent-foreground: #e7e4e2;
+  --sidebar-border: rgb(231 228 226 / 25%);
+  --sidebar-ring: #f1bc62;
+
+  --gold: #f1bc62;
+  --gold-foreground: #0b142e;
+  --ochre: #e7e4e2;
+  --ochre-foreground: #0b142e;
+  --saffron: #f1bc62;
+  --saffron-foreground: #0b142e;
+  --indigo: #32568a;
+  --indigo-foreground: #e7e4e2;
+  --cream: #e7e4e2;
+  --cream-foreground: #0b142e;
+  --day: #f1bc62;
+  --night: #32568a;
+  --neutral: #e7e4e2;
+}
+
+.today-shell {
+  background:
+    radial-gradient(circle at 50% 18%, rgb(50 86 138 / 45%), transparent 34rem),
+    radial-gradient(circle at 10% 55%, rgb(50 86 138 / 18%), transparent 24rem), var(--background);
+}
+
+.today-shell::before {
+  content: "";
+  position: fixed;
+  inset: 4rem 0 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: radial-gradient(rgb(231 228 226 / 70%) 0.7px, transparent 0.7px);
+  background-size: 78px 78px;
+  mask-image: linear-gradient(to bottom, black, transparent 70%);
+}
+
+.eyebrow {
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.location-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid rgb(231 228 226 / 18%);
+  border-radius: 999px;
+  background: rgb(11 24 43 / 72%);
+  padding: 0.5rem 0.7rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.location-pill:hover {
+  border-color: rgb(241 188 98 / 45%);
+  background: var(--card);
+}
+
+.solar-anchor {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.35rem;
+  row-gap: 0.1rem;
+  min-width: 0;
+  border-left: 1px solid rgb(231 228 226 / 18%);
+  padding-left: 0.55rem;
+}
+
+.solar-anchor > strong {
+  grid-column: 2;
+  font-size: 0.75rem;
+}
+
+.solar-anchor > span:first-child {
+  grid-row: span 2;
+}
+
+.solar-anchor svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.return-now {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.return-now:hover,
+.return-now:focus-visible {
+  background: rgb(50 86 138 / 28%);
+}
+.brand-mark {
+  background: var(--day);
+  color: var(--primary-foreground);
+  box-shadow: 0 0 24px rgb(241 188 98 / 20%);
+}
+.nav-active {
+  background: var(--day);
+  box-shadow: 0 4px 16px rgb(241 188 98 / 18%);
+}
+.mandala-segment {
+  cursor: pointer;
+  outline: none;
+  transition: filter 160ms ease;
+}
+
+.mandala-segment:hover,
+.mandala-segment:focus-visible {
+  filter: brightness(1.2);
+  stroke: var(--foreground);
+  stroke-width: 2;
+}
+
+.legend-dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 999px;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.legend-dot-day {
+  background: var(--day);
+}
+.legend-dot-night {
+  background: var(--night);
+}
+.legend-dot-current {
+  background: var(--day);
+  outline: 2px solid var(--neutral);
+  outline-offset: 1px;
+}
+.legend-dot-explore {
+  background: var(--neutral);
+  border: 2px solid var(--day);
+}
+
+.explore-detail {
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+
+/* Today deliberately has one readable palette in either theme mode. */
+.dark {
+  --background: #0b142e;
+  --foreground: #e7e4e2;
+  --card: #0b182b;
+  --card-foreground: #e7e4e2;
+  --popover: #0b182b;
+  --popover-foreground: #e7e4e2;
+  --primary: #f1bc62;
+  --primary-foreground: #0b142e;
+  --secondary: #32568a;
+  --secondary-foreground: #e7e4e2;
+  --muted: #32568a;
+  --muted-foreground: #e7e4e2;
+  --accent: #32568a;
+  --accent-foreground: #e7e4e2;
+  --border: rgb(231 228 226 / 25%);
+  --day: #f1bc62;
+  --night: #32568a;
+  --neutral: #e7e4e2;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+}
