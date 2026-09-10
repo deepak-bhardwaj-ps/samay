@@ -1,262 +1,312 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useId, useState, type FormEvent } from "react";
+import { Check, LocateFixed, MapPin, RotateCcw } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useLocation } from "@/hooks/use-location";
 import { usePreferences } from "@/hooks/use-preferences";
-import { longitudeToTimezoneOffset, formatTimezoneOffset } from "@/lib/vedic-time";
-import { MapPin, RotateCcw, LocateFixed } from "lucide-react";
+import type { GeoLocation } from "@/lib/vedic-time";
 
 export const Route = createFileRoute("/settings")({
-  head: () => ({
-    meta: [
-      { title: "Settings — Muhūrta Clock" },
-      {
-        name: "description",
-        content: "Set your location and customize how the Muhūrta Clock displays Vedic time.",
-      },
-      { property: "og:title", content: "Settings — Muhūrta Clock" },
-      {
-        property: "og:description",
-        content: "Set your location and customize how the Muhūrta Clock displays Vedic time.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Settings — Samay" }] }),
   component: SettingsPage,
 });
-
+const PLACES: GeoLocation[] = [
+  { name: "New Delhi", latitude: 28.6139, longitude: 77.209, timezone: "Asia/Kolkata" },
+  { name: "Varanasi", latitude: 25.3176, longitude: 82.9739, timezone: "Asia/Kolkata" },
+  { name: "Ujjain", latitude: 23.1765, longitude: 75.7885, timezone: "Asia/Kolkata" },
+  { name: "Mumbai", latitude: 19.076, longitude: 72.8777, timezone: "Asia/Kolkata" },
+  { name: "Sydney", latitude: -33.8688, longitude: 151.2093, timezone: "Australia/Sydney" },
+  { name: "London", latitude: 51.5072, longitude: -0.1276, timezone: "Europe/London" },
+];
 function SettingsPage() {
   const { location, setLocation, detectLocation, isDetecting, error } = useLocation();
   const { preferences, setPreferences, setVisibleUnit, resetPreferences } = usePreferences();
-
-  const [lat, setLat] = useState(location.latitude.toString());
-  const [lng, setLng] = useState(location.longitude.toString());
-  const [name, setName] = useState(location.name ?? "");
-  const [offset, setOffset] = useState(
-    location.timezoneOffset?.toString() ?? longitudeToTimezoneOffset(location.longitude).toString(),
-  );
-
-  const suggestedOffset = useMemo(() => longitudeToTimezoneOffset(parseFloat(lng) || 0), [lng]);
-
-  const handleSaveLocation = () => {
-    const latitude = parseFloat(lat);
-    const longitude = parseFloat(lng);
-    const timezoneOffset = parseFloat(offset);
-    if (!Number.isNaN(latitude) && !Number.isNaN(longitude) && !Number.isNaN(timezoneOffset)) {
-      const trimmedName = name.trim();
-      setLocation({ latitude, longitude, name: trimmedName || undefined, timezoneOffset });
-    }
-  };
-
+  const [saved, setSaved] = useState("");
   return (
-    <main className="min-h-[calc(100vh-4rem)] px-4 py-10 sm:py-16">
-      <div className="mx-auto max-w-2xl space-y-8">
-        <div className="text-center">
-          <h1 className="font-display text-3xl font-medium tracking-wide text-foreground sm:text-4xl">
-            Settings
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Choose your location and how you want to read the clock.
-          </p>
-        </div>
-
-        <section className="rounded-3xl border border-border/60 bg-card/60 p-6 sm:p-8">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-ochre" />
-            <h2 className="font-display text-xl text-foreground">Location</h2>
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Sunrise and sunset are calculated from these coordinates. The clock works anywhere on
-            Earth.
-          </p>
-
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="latitude">Latitude</Label>
-              <Input
-                id="latitude"
-                type="number"
-                step="any"
-                value={lat}
-                onChange={(e) => setLat(e.target.value)}
-                placeholder="e.g. 28.61"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="longitude">Longitude</Label>
-              <Input
-                id="longitude"
-                type="number"
-                step="any"
-                value={lng}
-                onChange={(e) => setLng(e.target.value)}
-                placeholder="e.g. 77.21"
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="location-name">Location name (optional)</Label>
-              <Input
-                id="location-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. New Delhi"
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="timezone-offset">Timezone offset from UTC (minutes)</Label>
-                <span className="text-xs text-muted-foreground">
-                  Solar estimate: {formatTimezoneOffset(suggestedOffset)}
-                </span>
-              </div>
-              <Input
-                id="timezone-offset"
-                type="number"
-                step="15"
-                value={offset}
-                onChange={(e) => setOffset(e.target.value)}
-                placeholder="e.g. 330 for IST (+5:30)"
-              />
-              <p className="text-xs text-muted-foreground">
-                Positive = east of UTC. Adjust this to your location&apos;s actual timezone so
-                sunrise/sunset display in local clock time.
-              </p>
-            </div>
-          </div>
-
-          {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
-
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Button
-              onClick={handleSaveLocation}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              Save location
-            </Button>
-            <Button
-              variant="outline"
-              onClick={detectLocation}
-              disabled={isDetecting}
-              className="gap-2"
-            >
-              <LocateFixed className="h-4 w-4" />
-              {isDetecting ? "Detecting…" : "Detect my location"}
-            </Button>
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-border/60 bg-card/60 p-6 sm:p-8">
-          <h2 className="font-display text-xl text-foreground">Display options</h2>
-          <div className="mt-5 space-y-4">
-            <PreferenceSwitch
-              label="Show Sanskrit names"
-              description="Display Devanagari script alongside transliterations."
-              checked={preferences.showSanskrit}
-              onCheckedChange={(v) => setPreferences({ showSanskrit: v })}
-            />
-            <PreferenceSwitch
-              label="Show modern time range"
-              description="Display when the current muhūrta starts and ends in clock time."
-              checked={preferences.showModernRange}
-              onCheckedChange={(v) => setPreferences({ showModernRange: v })}
-            />
-            <PreferenceSwitch
-              label="Show quality indicators"
-              description="Show whether a muhūrta is traditionally auspicious, neutral, or inauspicious."
-              checked={preferences.showQuality}
-              onCheckedChange={(v) => setPreferences({ showQuality: v })}
-            />
-            <PreferenceSwitch
-              label="Show sub-units"
-              description="Display ghaṭī, pala, and vipala readouts."
-              checked={preferences.showSubUnits}
-              onCheckedChange={(v) => setPreferences({ showSubUnits: v })}
-            />
-          </div>
-        </section>
-
-        {preferences.showSubUnits && (
-          <section className="rounded-3xl border border-border/60 bg-card/60 p-6 sm:p-8">
-            <h2 className="font-display text-xl text-foreground">Visible sub-units</h2>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <UnitToggle
-                label="Muhūrta"
-                checked={preferences.visibleUnits.muhurta}
-                onCheckedChange={(v) => setVisibleUnit("muhurta", v)}
-              />
-              <UnitToggle
-                label="Ghaṭī"
-                checked={preferences.visibleUnits.ghati}
-                onCheckedChange={(v) => setVisibleUnit("ghati", v)}
-              />
-              <UnitToggle
-                label="Pala"
-                checked={preferences.visibleUnits.pala}
-                onCheckedChange={(v) => setVisibleUnit("pala", v)}
-              />
-              <UnitToggle
-                label="Vipala"
-                checked={preferences.visibleUnits.vipala}
-                onCheckedChange={(v) => setVisibleUnit("vipala", v)}
-              />
-            </div>
-          </section>
-        )}
-
-        <div className="flex justify-center">
-          <Button
-            variant="ghost"
-            onClick={resetPreferences}
-            className="gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reset all preferences
-          </Button>
-        </div>
+    <main className="content-page">
+      <div className="page-intro">
+        <p className="eyebrow">Make time your own</p>
+        <h1>
+          Your place.
+          <br />
+          Your rhythm.
+        </h1>
+        <p>
+          The Sun keeps a different clock in every place. Set yours, then choose how much detail you
+          want to see.
+        </p>
       </div>
+      <section className="settings-section">
+        <h2>Where you are</h2>
+        <p>Your location sets the solar day. Choose a city or use your device location.</p>
+        <p className="current-place">
+          <MapPin size={16} />
+          {location.name || "Custom location"}
+        </p>
+        <div className="place-grid">
+          {PLACES.map((place) => (
+            <button
+              key={place.name}
+              className={`place-option ${location.latitude === place.latitude && location.longitude === place.longitude ? "active" : ""}`}
+              aria-pressed={
+                location.latitude === place.latitude && location.longitude === place.longitude
+              }
+              onClick={() => {
+                setLocation(place);
+                setSaved(`Clock set to ${place.name}.`);
+              }}
+            >
+              {place.name}
+              <small>
+                {place.timezone === "Asia/Kolkata"
+                  ? "India · IST"
+                  : place.timezone?.replace("/", " · ")}
+              </small>
+            </button>
+          ))}
+        </div>
+        <button
+          className="secondary-button"
+          onClick={() => {
+            setSaved("");
+            detectLocation();
+          }}
+          disabled={isDetecting}
+        >
+          <LocateFixed size={16} />
+          {isDetecting ? "Finding your location…" : "Use my current location"}
+        </button>
+        {error && (
+          <p role="alert" className="feedback error">
+            {error}
+          </p>
+        )}
+        <p className="helper-text">
+          Location is used on this device to calculate solar times. You can use a city without
+          sharing your device location.
+        </p>
+        <details className="settings-disclosure">
+          <summary>Set a custom location</summary>
+          <LocationForm
+            key={JSON.stringify(location)}
+            location={location}
+            onSave={(value) => {
+              setLocation(value);
+              setSaved("Custom location saved.");
+            }}
+          />
+        </details>
+        <p role="status" className="feedback">
+          {saved}
+        </p>
+      </section>
+      <section className="settings-section">
+        <h2>Reading the clock</h2>
+        <Preference
+          label="Sanskrit names"
+          description="Show Devanagari alongside the current muhūrta name."
+          checked={preferences.showSanskrit}
+          onChange={(value) => setPreferences({ showSanskrit: value })}
+        />
+        <Preference
+          label="Modern clock time"
+          description="Keep familiar local time beneath the solar dial."
+          checked={preferences.showModernRange}
+          onChange={(value) => setPreferences({ showModernRange: value })}
+        />
+        <Preference
+          label="Traditional associations"
+          description="Include cultural qualities in muhūrta details."
+          checked={preferences.showQuality}
+          onChange={(value) => setPreferences({ showQuality: value })}
+        />
+        <Preference
+          label="Ghaṭī and pal readout"
+          description="See fixed units counting from sunrise."
+          checked={preferences.showSubUnits}
+          onChange={(value) => setPreferences({ showSubUnits: value })}
+        />
+        <Preference
+          label="A quieter view"
+          description="Hide learning prompts on the Today screen."
+          checked={preferences.simplifiedMode}
+          onChange={(value) => setPreferences({ simplifiedMode: value })}
+        />
+        {preferences.showSubUnits && (
+          <div className="unit-toggles">
+            {(
+              [
+                ["ghati", "Ghaṭī"],
+                ["pala", "Pal"],
+                ["vipala", "Vipal"],
+              ] as const
+            ).map(([key, label]) => (
+              <label className="unit-toggle" key={key}>
+                <input
+                  type="checkbox"
+                  checked={preferences.visibleUnits[key]}
+                  onChange={(event) => setVisibleUnit(key, event.target.checked)}
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        )}
+      </section>
+      <button
+        className="text-button"
+        onClick={() => {
+          resetPreferences();
+          setSaved("Display preferences restored.");
+        }}
+      >
+        <RotateCcw size={14} /> Reset display preferences
+      </button>
+      <section className="app-note">
+        <strong>Try Samay on your iPhone</strong>
+        <p>
+          Open the app in Safari. Use Share → Add to Home Screen for a dedicated, full-screen
+          experience. The app remembers your place and preferences on this device.
+        </p>
+      </section>
     </main>
   );
 }
-
-function PreferenceSwitch({
+function Preference({
   label,
   description,
   checked,
-  onCheckedChange,
+  onChange,
 }: {
   label: string;
   description: string;
   checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
+  onChange: (value: boolean) => void;
 }) {
+  const id = useId();
   return (
-    <div className="flex items-start justify-between gap-4">
+    <div className="preference-row">
       <div>
-        <p className="font-medium text-foreground">{label}</p>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <label htmlFor={id}>{label}</label>
+        <p>{description}</p>
       </div>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+      <Switch id={id} checked={checked} onCheckedChange={onChange} />
     </div>
   );
 }
-
-function UnitToggle({
-  label,
-  checked,
-  onCheckedChange,
+function LocationForm({
+  location,
+  onSave,
 }: {
-  label: string;
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
+  location: GeoLocation;
+  onSave: (value: GeoLocation) => void;
 }) {
+  const [name, setName] = useState(location.name ?? "");
+  const [latitude, setLatitude] = useState(String(location.latitude));
+  const [longitude, setLongitude] = useState(String(location.longitude));
+  const [timezone, setTimezone] = useState(location.timezone ?? "Asia/Kolkata");
+  const [error, setError] = useState("");
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    const lat = Number(latitude),
+      lng = Number(longitude);
+    if (
+      !latitude.trim() ||
+      !longitude.trim() ||
+      !Number.isFinite(lat) ||
+      Math.abs(lat) > 90 ||
+      !Number.isFinite(lng) ||
+      Math.abs(lng) > 180
+    ) {
+      setError("Enter a latitude from −90 to 90 and a longitude from −180 to 180.");
+      return;
+    }
+    try {
+      new Intl.DateTimeFormat("en", { timeZone: timezone.trim() }).format();
+    } catch {
+      setError("Enter a valid timezone, such as Asia/Kolkata or Australia/Sydney.");
+      return;
+    }
+    onSave({
+      latitude: lat,
+      longitude: lng,
+      name: name.trim() || "Custom location",
+      timezone: timezone.trim(),
+    });
+    setError("");
+  }
   return (
-    <div className="flex items-center justify-between rounded-xl border border-border/60 bg-background/60 p-3">
-      <span className="font-medium text-foreground">{label}</span>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} />
-    </div>
+    <form className="settings-form" onSubmit={submit}>
+      <label className="form-wide">
+        Place name
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoComplete="off"
+          placeholder="Your place"
+        />
+      </label>
+      <label>
+        Latitude
+        <input
+          type="number"
+          min="-90"
+          max="90"
+          step="any"
+          required
+          value={latitude}
+          onChange={(e) => setLatitude(e.target.value)}
+        />
+      </label>
+      <label>
+        Longitude
+        <input
+          type="number"
+          min="-180"
+          max="180"
+          step="any"
+          required
+          value={longitude}
+          onChange={(e) => setLongitude(e.target.value)}
+        />
+      </label>
+      <label className="form-wide">
+        Timezone
+        <input
+          value={timezone}
+          onChange={(e) => setTimezone(e.target.value)}
+          required
+          list="timezones"
+          placeholder="Australia/Sydney"
+          autoComplete="off"
+        />
+        <datalist id="timezones">
+          {[
+            "Asia/Kolkata",
+            "Australia/Sydney",
+            "Europe/London",
+            "America/New_York",
+            "America/Los_Angeles",
+            "Asia/Singapore",
+            "Asia/Dubai",
+          ].map((value) => (
+            <option key={value} value={value} />
+          ))}
+        </datalist>
+      </label>
+      <p className="helper-text form-wide">
+        Use a named timezone so daylight-saving changes are handled automatically.
+      </p>
+      <div className="field-actions form-wide">
+        <button type="submit" className="primary-button">
+          <Check size={16} /> Save location
+        </button>
+      </div>
+      {error && (
+        <p className="feedback error form-wide" role="alert">
+          {error}
+        </p>
+      )}
+    </form>
   );
 }

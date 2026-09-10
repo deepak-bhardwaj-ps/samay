@@ -1,4 +1,10 @@
-import { PanchangaCalculator, type CivilDate, type Location } from "@siva-sh/hora";
+import {
+  PanchangaCalculator,
+  type CivilDate,
+  type Location,
+  type TimelineSegment,
+  type Panchanga as HoraPanchanga,
+} from "@siva-sh/hora";
 import type { GeoLocation, VedicTime } from "@/lib/vedic-time";
 
 export type Ayanamsha = "lahiri";
@@ -23,6 +29,7 @@ export interface PanchangaRequest {
   readonly latitude: number;
   readonly longitude: number;
   readonly timeZoneId: string;
+  readonly utcOffset?: number;
   readonly ayanamsha: Ayanamsha;
   readonly dayBoundary: DayBoundary;
 }
@@ -36,6 +43,7 @@ export interface PanchangaSnapshot extends Panchanga {
     readonly ayanamsha: Ayanamsha;
     readonly dayBoundary: DayBoundary;
     readonly timeZoneId: string;
+    readonly utcOffset?: number;
   };
 }
 
@@ -62,51 +70,82 @@ export function getInitialPanchanga(vedicTime: VedicTime): Panchanga {
 
 /** Client-side adapter for the bundled Swiss Ephemeris implementation. */
 export class HoraPanchangaProvider implements PanchangaProvider {
+  private dailyCache = new Map<
+    string,
+    { daily: HoraPanchanga; following: HoraPanchanga; timeline: TimelineSegment[] }
+  >();
   private calculatorPromise: Promise<PanchangaCalculator> | undefined;
+  private createCalculator: () => Promise<PanchangaCalculator>;
+  constructor(
+    createCalculator = () => PanchangaCalculator.create({ ayanamsha: "lahiri", offline: true }),
+  ) {
+    this.createCalculator = createCalculator;
+  }
 
   async getSnapshot(request: PanchangaRequest, vedicTime: VedicTime): Promise<PanchangaSnapshot> {
     const calculator = await this.getCalculator();
-    const location: Location = {
-      latitude: request.latitude,
-      longitude: request.longitude,
-      timeZone: request.timeZoneId,
-    };
-    const localDate = toCivilDate(request.instantUtc, request.timeZoneId);
-    const localDay = calculator.calculate(localDate, location, { riseSetMethod: "swiss" });
+    const location: Location =
+      request.utcOffset !== undefined
+        ? {
+            latitude: request.latitude,
+            longitude: request.longitude,
+            utcOffset: request.utcOffset / 60,
+          }
+        : {
+            latitude: request.latitude,
+            longitude: request.longitude,
+            timeZone: request.timeZoneId,
+          };
     const anchorDate =
-      request.instantUtc < localDay.sunrise ? shiftCivilDate(localDate, -1) : localDate;
-    const daily = sameCivilDate(anchorDate, localDate)
-      ? localDay
-      : calculator.calculate(anchorDate, location, { riseSetMethod: "swiss" });
-    const timeline = calculator.timeline(anchorDate, location, { riseSetMethod: "swiss" });
+      request.utcOffset !== undefined
+        ? toCivilDate(new Date(vedicTime.dayStart.getTime() + request.utcOffset * 60000), "UTC")
+        : toCivilDate(vedicTime.dayStart, request.timeZoneId);
+    const cacheKey = JSON.stringify([anchorDate, location]);
+    let cached = this.dailyCache.get(cacheKey);
+    if (!cached) {
+      cached = {
+        daily: calculator.calculate(anchorDate, location, { riseSetMethod: "swiss" }),
+        following: calculator.calculate(shiftCivilDate(anchorDate, 1), location, {
+          riseSetMethod: "swiss",
+        }),
+        timeline: calculator.timeline(anchorDate, location, { riseSetMethod: "swiss" }),
+      };
+      if (this.dailyCache.size > 8) this.dailyCache.clear();
+      this.dailyCache.set(cacheKey, cached);
+    }
+    const { daily, following, timeline } = cached;
     const active = timeline.filter(
       (segment) => segment.start <= request.instantUtc && request.instantUtc < segment.end,
     );
     const activeTithi = active.find((segment) => segment.limb === "tithi");
-    const tithiDuration = activeTithi ? activeTithi.end.getTime() - activeTithi.start.getTime() : 0;
-    const tithiProgress =
-      activeTithi && tithiDuration > 0
-        ? Math.min(
-            100,
-            Math.max(
-              0,
-              ((request.instantUtc.getTime() - activeTithi.start.getTime()) / tithiDuration) * 100,
-            ),
-          )
-        : null;
-    const tithiValidUntil = activeTithi ? new Date(activeTithi.end) : null;
+    // Timeline segments are clipped to sunrise. Do not present that clipping
+    // boundary as a lunar transition or a full-tithi percentage.
+    const tithiIndex = activeTithi?.index ?? daily.tithi.index;
+    const actualTithi =
+      tithiIndex === daily.tithi.index
+        ? daily.tithi
+        : following.tithi.index === tithiIndex
+          ? following.tithi
+          : null;
+    const tithiValidUntil =
+      actualTithi && !actualTithi.bounded
+        ? actualTithi.endsAt
+        : activeTithi && activeTithi.end < following.sunrise
+          ? new Date(activeTithi.end)
+          : null;
+    const tithiProgress = null;
     const valueFor = (limb: "tithi" | "nakshatra" | "yoga" | "karana", fallback: string) =>
       active.find((segment) => segment.limb === limb)?.name ?? fallback;
     const transition = active.reduce(
       (soonest, segment) => Math.min(soonest, segment.end.getTime()),
-      daily.sunset.getTime(),
+      vedicTime.cycleEnd.getTime(),
     );
 
     return Object.freeze({
       isProvisional: false,
       vara: daily.vara.name,
       key: makeSnapshotKey(request),
-      tithi: `${daily.paksha === "Shukla" ? "Śukla" : "Kṛṣṇa"} ${valueFor("tithi", daily.tithi.name)}`,
+      tithi: `${(activeTithi?.index ?? daily.tithi.index) < 15 ? "Śukla" : "Kṛṣṇa"} ${TITHI_NAMES[(activeTithi?.index ?? daily.tithi.index) % 15] === "Pūrṇimā" && (activeTithi?.index ?? daily.tithi.index) >= 15 ? "Amāvasyā" : TITHI_NAMES[(activeTithi?.index ?? daily.tithi.index) % 15]}`,
       tithiProgress,
       tithiValidUntil,
       prahar: getPrahar(vedicTime),
@@ -125,7 +164,7 @@ export class HoraPanchangaProvider implements PanchangaProvider {
   }
 
   private getCalculator() {
-    this.calculatorPromise ??= PanchangaCalculator.create({ ayanamsha: "lahiri", offline: true });
+    this.calculatorPromise ??= this.createCalculator();
     return this.calculatorPromise;
   }
 }
@@ -139,12 +178,15 @@ export function getPanchanga(
   location: GeoLocation,
   provider: PanchangaProvider = defaultProvider,
 ): Promise<PanchangaSnapshot> {
+  if (!vedicTime.solarDataAvailable)
+    return Promise.reject(new Error("Solar boundaries unavailable"));
   return provider.getSnapshot(
     {
       instantUtc: date,
       latitude: location.latitude,
       longitude: location.longitude,
-      timeZoneId: location.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timeZoneId: location.timezone ?? "UTC",
+      ...(!location.timezone ? { utcOffset: vedicTime.timezoneOffset } : {}),
       ayanamsha: "lahiri",
       dayBoundary: "local-sunrise",
     },
@@ -192,6 +234,27 @@ function makeSnapshotKey(request: PanchangaRequest): string {
 }
 
 function getPrahar(time: VedicTime): string {
-  const quarter = Math.min(4, Math.floor(time.muhurtaIndex / 4) + 1);
+  const quarter = Math.min(
+    4,
+    Math.floor(((time.muhurtaIndex - 1 + time.muhurtaProgress) / 15) * 4) + 1,
+  );
   return `${time.period === "day" ? "Day" : "Night"} Prahar ${quarter}`;
 }
+
+const TITHI_NAMES = [
+  "Pratipadā",
+  "Dvitīyā",
+  "Tṛtīyā",
+  "Caturthī",
+  "Pañcamī",
+  "Ṣaṣṭhī",
+  "Saptamī",
+  "Aṣṭamī",
+  "Navamī",
+  "Daśamī",
+  "Ekādaśī",
+  "Dvādaśī",
+  "Trayodaśī",
+  "Caturdaśī",
+  "Pūrṇimā",
+];

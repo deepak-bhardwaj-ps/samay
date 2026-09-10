@@ -1,0 +1,16 @@
+{
+  "name": "Samay \u2014 Indian time",
+  "short_name": "Samay",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#f7f5ef",
+  "icons": [
+    {
+      "src": "/app-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

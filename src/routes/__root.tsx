@@ -78,8 +78,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Muhūrta Clock" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { title: "Samay" },
+      { name: "theme-color", content: "#f7f5ef" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "Samay" },
       {
         name: "description",
         content:
@@ -100,20 +104,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tiro+Devanagari+Sanskrit:ital@0;1&display=swap",
-      },
+      { rel: "icon", href: "/app-icon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/app-icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
   shellComponent: RootShell,
@@ -123,6 +116,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  if (import.meta.env["VITE_STATIC_APP"] === "true") return <>{children}</>;
   return (
     <html lang="en">
       <head>

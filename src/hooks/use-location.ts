@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { useEffect, useState, useCallback } from "react";
 import {
   getBrowserTimezoneOffset,
@@ -28,7 +29,12 @@ function loadStoredLocation(): GeoLocation | null {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as GeoLocation;
-      if (typeof parsed.latitude === "number" && typeof parsed.longitude === "number") {
+      if (
+        Number.isFinite(parsed.latitude) &&
+        Math.abs(parsed.latitude) <= 90 &&
+        Number.isFinite(parsed.longitude) &&
+        Math.abs(parsed.longitude) <= 180
+      ) {
         return normalizeLocation(parsed);
       }
     }
@@ -61,7 +67,32 @@ export function useLocation() {
     setError(null);
   }, []);
 
-  const detectLocation = useCallback(() => {
+  const detectLocation = useCallback(async () => {
+    if (Capacitor.isNativePlatform()) {
+      setIsDetecting(true);
+      setError(null);
+      try {
+        const { Geolocation } = await import("@capacitor/geolocation");
+        const position = await Geolocation.getCurrentPosition({
+          enableHighAccuracy: false,
+          timeout: 10000,
+        });
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          name: "Current location",
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          timezoneOffset: getBrowserTimezoneOffset(),
+        });
+      } catch {
+        setError(
+          "Location could not be read. Choose a city or allow location access in your device settings.",
+        );
+      } finally {
+        setIsDetecting(false);
+      }
+      return;
+    }
     if (typeof window === "undefined" || !("geolocation" in navigator)) {
       setError("Geolocation is not available in this browser.");
       return;
@@ -89,49 +120,9 @@ export function useLocation() {
     );
   }, [setLocation]);
 
-  // Try auto-detecting on first mount only if no stored location exists.
-  // Permission-denied errors are suppressed so the default location loads quietly.
   useEffect(() => {
-    if (typeof window === "undefined" || !("geolocation" in navigator)) return;
     const stored = loadStoredLocation();
     if (stored) setLocationState(stored);
-    const shouldDetect = !stored || stored.name === "Current location";
-    const run = () => {
-      setIsDetecting(true);
-      setError(null);
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const normalized = normalizeLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            name: "Current location",
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            timezoneOffset: getBrowserTimezoneOffset(),
-          });
-          saveStoredLocation(normalized);
-          setLocationState(normalized);
-          setIsDetecting(false);
-        },
-        () => {
-          // Silent fallback to default location.
-          setIsDetecting(false);
-        },
-        { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
-      );
-    };
-
-    if (shouldDetect) {
-      run();
-      return;
-    }
-    // A manually chosen place stays put, but if permission is already granted
-    // and the user never picked a place, keep coordinates fresh.
-    navigator.permissions
-      ?.query({ name: "geolocation" as PermissionName })
-      .then((status) => {
-        if (status.state === "granted" && !stored) run();
-      })
-      .catch(() => {});
   }, []);
 
   return { location, setLocation, detectLocation, isDetecting, error };

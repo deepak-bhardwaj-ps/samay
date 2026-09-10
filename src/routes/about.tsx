@@ -1,100 +1,129 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Clock, Sunrise, BookOpen, Compass } from "lucide-react";
-
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About Muhūrta — Vedic Timekeeping" },
-      {
-        name: "description",
-        content:
-          "Learn what a muhūrta is, how Vedic time differs from clock time, and how to use the muhūrta clock in daily life.",
-      },
-      { property: "og:title", content: "About Muhūrta — Vedic Timekeeping" },
-      {
-        property: "og:description",
-        content: "Learn what a muhūrta is and how Vedic time differs from clock time.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "The philosophy — Samay" }] }),
   component: AboutPage,
 });
-
 function AboutPage() {
   return (
-    <main className="min-h-[calc(100vh-4rem)] px-4 py-10 sm:py-16">
-      <div className="mx-auto max-w-3xl space-y-10">
-        <div className="text-center">
-          <h1 className="font-display text-3xl font-medium tracking-wide text-foreground sm:text-4xl">
-            What is Muhūrta?
-          </h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            A muhūrta is far more than an ancient unit of time. It is a way of relating to the
-            rhythm of the day.
-          </p>
-        </div>
-
-        <section className="rounded-3xl border border-border/60 bg-card/60 p-6 sm:p-8">
-          <div className="flex items-center gap-3">
-            <Clock className="h-6 w-6 text-ochre" />
-            <h2 className="font-display text-2xl text-foreground">Clock time vs. solar time</h2>
-          </div>
-          <p className="mt-4 leading-relaxed text-muted-foreground">
-            Modern clocks divide the day into 24 equal hours of 60 minutes each. This is convenient
-            but disconnected from the actual light cycle. Vedic timekeeping instead divides the{" "}
-            <em>day</em> (sunrise to sunset) and the <em>night</em> (sunset to next sunrise) each
-            into 15 muhūrtas — 30 in the full ahorātra. Because the lengths of day and night change
-            through the year, a muhūrta is not a fixed 48 minutes — it breathes with the seasons.
-          </p>
-        </section>
-
-        <section className="rounded-3xl border border-border/60 bg-card/60 p-6 sm:p-8">
-          <div className="flex items-center gap-3">
-            <Sunrise className="h-6 w-6 text-gold" />
-            <h2 className="font-display text-2xl text-foreground">Why sunrise?</h2>
-          </div>
-          <p className="mt-4 leading-relaxed text-muted-foreground">
-            In the Vedic view, sunrise is the natural beginning of the day. The first muhūrta of the
-            day starts at sunrise, and the first muhūrta of the night starts at sunset. This makes
-            the clock local: the same modern clock time can fall in a different muhūrta in Stockholm
-            than in Singapore.
-          </p>
-        </section>
-
-        <section className="rounded-3xl border border-border/60 bg-card/60 p-6 sm:p-8">
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-6 w-6 text-indigo" />
-            <h2 className="font-display text-2xl text-foreground">The 30 muhūrtas</h2>
-          </div>
-          <p className="mt-4 leading-relaxed text-muted-foreground">
-            Each of the 15 muhūrtas of the day and the 15 of the night carries a name and a quality.
-            Some are auspicious for beginnings, some are better for inner work, and some are
-            traditionally avoided for major undertakings. The names move in a cycle, so the quality
-            of a moment can be read at a glance once you learn the pattern.
-          </p>
-        </section>
-
-        <section className="rounded-3xl border border-border/60 bg-card/60 p-6 sm:p-8">
-          <div className="flex items-center gap-3">
-            <Compass className="h-6 w-6 text-emerald-600" />
-            <h2 className="font-display text-2xl text-foreground">Using this in daily life</h2>
-          </div>
-          <ul className="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
-            <li>Check the current muhūrta before starting an important task or meeting.</li>
-            <li>
-              Notice how the day feels different when you think in 48-minute solar windows instead
-              of hours.
-            </li>
-            <li>Use the app to learn the names; over time, the rhythm becomes familiar.</li>
-            <li>
-              Remember that tradition varies by region and lineage — treat this as a living
-              reference, not a rigid rulebook.
-            </li>
-          </ul>
-        </section>
+    <main className="content-page">
+      <div className="page-intro">
+        <p className="eyebrow">The philosophy</p>
+        <h1>
+          Time is more
+          <br />
+          than a number.
+        </h1>
+        <p>
+          Samay is a small invitation to reconnect your daily life with the movement of the Sun and
+          Moon.
+        </p>
       </div>
+      <section className="lesson-hero">
+        <p className="eyebrow">समय · Time</p>
+        <h2>
+          An ancient language.
+          <br />
+          An everyday practice.
+        </h2>
+        <p>
+          A clock can tell you how late you are. It can also help you notice where you are in the
+          day. Samay puts the second idea first.
+        </p>
+      </section>
+      <section className="reading-section">
+        <h2>Start gently.</h2>
+        <div className="reading-step">
+          <span>01</span>
+          <div>
+            <h3>Meet the moment.</h3>
+            <p>
+              Open Today. Read the current muhūrta and see where its marker sits between sunrise and
+              sunset.
+            </p>
+          </div>
+        </div>
+        <div className="reading-step">
+          <span>02</span>
+          <div>
+            <h3>Find your chapter.</h3>
+            <p>
+              Use the prahar to recognise your broader part of the day. Notice how its length
+              changes with the season.
+            </p>
+          </div>
+        </div>
+        <div className="reading-step">
+          <span>03</span>
+          <div>
+            <h3>Learn one unit.</h3>
+            <p>
+              Keep modern time visible while ghaṭī and pal become familiar. There is no need to
+              learn everything at once.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section className="reading-section">
+        <h2>What the clock measures.</h2>
+        <p>
+          The solar dial divides daylight and night into fifteen muhūrtas each. Each half also
+          contains four prahars. These are seasonal divisions: they change with your location and
+          the time of year.
+        </p>
+        <p>
+          Ghaṭī, pal and vipal are fixed units: 24 minutes, 24 seconds and 0.4 seconds respectively.
+          A fixed muhūrta is 48 minutes. It should not be confused with the seasonal muhūrtas on the
+          dial.
+        </p>
+        <p>
+          Tithi, nakshatra, yoga and karaṇa are calculated with Swiss Ephemeris through the Hora
+          library, using Lahiri ayanāṃśa and an offline ephemeris fallback. Vāra follows the local
+          sunrise. Solar events use SunCalc. Small boundary differences between calculation methods
+          are possible.
+        </p>
+        <p>
+          The named muhūrta sequence and qualities follow the Drik Panchang Do Ghati reference.
+          Names and traditional associations are a cultural reference. They vary across texts and
+          communities; Samay does not present them as universal prescriptions.
+        </p>
+      </section>
+      <section className="reading-section">
+        <h2>Sources & conventions</h2>
+        <p>
+          <a
+            href="https://www.drikpanchang.com/muhurat/daily/do-ghati-muhurat.html"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Drik Panchang · Do Ghati muhūrta names
+          </a>
+          <br />
+          The named sequence and associated traditional qualities. Samay separately uses fixed ghaṭī
+          and pal for elapsed time.
+        </p>
+        <p>
+          <a
+            href="https://www.namami.gov.in/sites/default/files/Prakshika/Prakashika-44%20Brahmsiddhant-Final.pdf"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Brahmasiddhānta · National Mission for Manuscripts
+          </a>
+          <br />
+          Background on traditional time units.
+        </p>
+        <p>
+          <a href="https://www.npmjs.com/package/@siva-sh/hora" target="_blank" rel="noreferrer">
+            Hora calculation library
+          </a>
+          <br />
+          Lunar calculations, named timezones and documented conventions.
+        </p>
+      </section>
+      <Link to="/" className="text-link">
+        Return to this moment <ArrowRight size={16} />
+      </Link>
     </main>
   );
 }

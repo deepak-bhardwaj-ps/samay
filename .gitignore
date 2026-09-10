@@ -33,3 +33,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Bundled mobile output
+dist-mobile/
+ios/App/App/public/
+ios/App/App/capacitor.config.json
+ios/App/CapApp-SPM/.build/
+
+.vercel/
+artifacts/
+.vercel

@@ -1,4 +1,5 @@
 import SunCalc from "suncalc3";
+import { getMuhurtaByIndex } from "./muhurta-data.ts";
 
 export interface GeoLocation {
   latitude: number;
@@ -80,18 +81,58 @@ export function getMuhurtaWindow(vedicTime: VedicTime, absoluteIndex: number): M
   return { period, position, start, end, duration };
 }
 
+const solarCache = new Map<string, SunriseSunset>();
+
+/** Resolve the named timezone at the instant, including daylight-saving changes. */
+export function getLocationOffset(date: Date, location: GeoLocation): number {
+  if (location.timezone) {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: location.timezone,
+      timeZoneName: "shortOffset",
+    }).formatToParts(date);
+    const zone = parts.find((part) => part.type === "timeZoneName")?.value ?? "GMT";
+    const match = zone.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
+    if (match) return (match[1] === "-" ? -1 : 1) * (Number(match[2]) * 60 + Number(match[3] ?? 0));
+    return 0;
+  }
+  return location.timezoneOffset ?? longitudeToTimezoneOffset(location.longitude);
+}
+
 export function getSunriseSunset(date: Date, location: GeoLocation): SunriseSunset {
-  const today = new Date(date);
-  today.setHours(12, 0, 0, 0);
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  const todayTimes = SunCalc.getSunTimes(today, location.latitude, location.longitude);
-  const tomorrowTimes = SunCalc.getSunTimes(tomorrow, location.latitude, location.longitude);
-  const yesterdayTimes = SunCalc.getSunTimes(yesterday, location.latitude, location.longitude);
+  const local = applyTimezoneOffset(date, getLocationOffset(date, location));
+  const today = new Date(
+    Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate(), 12),
+  );
+  const key = `${today.toISOString()}|${location.latitude}|${location.longitude}`;
+  const cached = solarCache.get(key);
+  if (cached) return cached;
+  const tomorrow = new Date(today.getTime() + 86400000);
+  const yesterday = new Date(today.getTime() - 86400000);
+  // UTC calendar arithmetic deliberately avoids the device's own timezone.
+  const todayTimes = SunCalc.getSunTimes(
+    today,
+    location.latitude,
+    location.longitude,
+    0,
+    true,
+    true,
+  );
+  const tomorrowTimes = SunCalc.getSunTimes(
+    tomorrow,
+    location.latitude,
+    location.longitude,
+    0,
+    true,
+    true,
+  );
+  const yesterdayTimes = SunCalc.getSunTimes(
+    yesterday,
+    location.latitude,
+    location.longitude,
+    0,
+    true,
+    true,
+  );
 
   const validEvent = (...events: Array<{ value: Date; valid: boolean } | undefined>) =>
     events.find((event) => event?.valid && Number.isFinite(event.value.getTime()))?.value;
@@ -134,7 +175,10 @@ export function getSunriseSunset(date: Date, location: GeoLocation): SunriseSuns
     };
   }
 
-  return { sunrise, sunset, solarNoon, nextSunrise, prevSunrise, prevSunset };
+  const result = { sunrise, sunset, solarNoon, nextSunrise, prevSunrise, prevSunset };
+  if (solarCache.size > 16) solarCache.clear();
+  solarCache.set(key, result);
+  return result;
 }
 
 export function getVedicTime(date: Date, location: GeoLocation): VedicTime {
@@ -143,7 +187,7 @@ export function getVedicTime(date: Date, location: GeoLocation): VedicTime {
     location,
   );
 
-  const timezoneOffset = location.timezoneOffset ?? longitudeToTimezoneOffset(location.longitude);
+  const timezoneOffset = getLocationOffset(date, location);
   if (
     ![sunrise, sunset, solarNoon, nextSunrise, prevSunrise, prevSunset].every((value) =>
       Number.isFinite(value.getTime()),
@@ -226,12 +270,10 @@ export function getVedicTime(date: Date, location: GeoLocation): VedicTime {
   // Ghaṭī/Pala are fixed traditional units measured independently from sunrise.
   // They must not be derived from variable solar muhūrta durations.
   const elapsedSinceSunrise = Math.max(0, date.getTime() - dayStart.getTime());
-  const totalGhati = elapsedSinceSunrise / (24 * 60 * 1000);
-  const ghati = Math.floor(totalGhati);
-  const fractionalGhati = totalGhati - ghati;
-  const totalPala = fractionalGhati * 60;
-  const pala = Math.floor(totalPala);
-  const vipala = Math.floor((totalPala - pala) * 60);
+  // Integer remainders avoid floating-point rollover errors at exact pal boundaries.
+  const ghati = Math.floor(elapsedSinceSunrise / 1440000);
+  const pala = Math.floor((elapsedSinceSunrise % 1440000) / 24000);
+  const vipala = Math.floor((elapsedSinceSunrise % 24000) / 400);
 
   // The 30 names run continuously: 1–15 by day, 16–30 by night
   const muhurtaName = getMuhurtaName(absoluteIndex);
@@ -286,42 +328,8 @@ export function formatTimezoneOffset(offsetMinutes: number): string {
   return `UTC${sign}${hours}${mins > 0 ? `:${mins.toString().padStart(2, "0")}` : ""}`;
 }
 
-const MUHURTA_NAMES = [
-  "Rudra",
-  "Āhi",
-  "Mitra",
-  "Pitṛ",
-  "Vasu",
-  "Vāruṇa",
-  "Vāyu",
-  "Savitṛ",
-  "Viśvedevāḥ",
-  "Indra",
-  "Indrāgni",
-  "Dhātṛ",
-  "Puṣan",
-  "Tvasṭṛ",
-  "Yama",
-  "Gandharva",
-  "Kṛttikā",
-  "Rohiṇī",
-  "Mṛgaśīrṣa",
-  "Ārdrā",
-  "Punarvasu",
-  "Puṣya",
-  "Āśleṣā",
-  "Maghā",
-  "Pūrvaphālgunī",
-  "Uttaraphālgunī",
-  "Hasta",
-  "Citrā",
-  "Svātī",
-  "Viśākhā",
-];
-
 function getMuhurtaName(index: number): string {
-  const normalized = (((index - 1) % 30) + 30) % 30;
-  return MUHURTA_NAMES[normalized]!;
+  return getMuhurtaByIndex(index).name;
 }
 
 export function formatDuration(ms: number): string {
@@ -371,7 +379,7 @@ export function isBrahmaMuhurta(date: Date, location: GeoLocation): boolean {
   const { sunrise } = getSunriseSunset(date, location);
   if (!Number.isFinite(sunrise.getTime())) return false;
   const brahmaStart = new Date(sunrise.getTime() - 96 * 60 * 1000); // 96 minutes before sunrise
-  const brahmaEnd = sunrise;
+  const brahmaEnd = new Date(sunrise.getTime() - 48 * 60 * 1000);
   return date >= brahmaStart && date < brahmaEnd;
 }
 
@@ -387,4 +395,18 @@ export function getAbhijitMuhurta(
   const start = new Date(sunrise.getTime() + 7 * muhurtaLength);
   const end = new Date(start.getTime() + muhurtaLength);
   return { start, end };
+}
+
+/** Four equal prahars in each solar half; muhūrta boundaries do not divide by four. */
+export function getPraharWindow(time: VedicTime, instant: Date) {
+  const periodStart = time.period === "day" ? time.dayStart : time.dayEnd;
+  const duration = (time.period === "day" ? time.dayLength : time.nightLength) / 4;
+  const elapsed = instant.getTime() - periodStart.getTime();
+  const index = Math.min(4, Math.max(1, Math.floor(elapsed / duration) + 1));
+  return {
+    index,
+    start: new Date(periodStart.getTime() + (index - 1) * duration),
+    end: new Date(periodStart.getTime() + index * duration),
+    progress: Math.min(1, Math.max(0, elapsed / duration - (index - 1))),
+  };
 }
