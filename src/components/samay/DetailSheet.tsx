@@ -1,6 +1,6 @@
-import * as Dialog from "@radix-ui/react-dialog";
+import { useEffect, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
 
 export function DetailSheet({
   open,
@@ -17,26 +17,65 @@ export function DetailSheet({
   description: string;
   children?: ReactNode;
 }) {
-  return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={(value) => {
-        if (!value) onClose();
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const previousFocus = useRef<HTMLElement | null>(null);
+  const closeCallback = useRef(onClose);
+  closeCallback.current = onClose;
+  useEffect(() => {
+    if (!open) return;
+    previousFocus.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus({ preventScroll: true });
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeCallback.current();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      requestAnimationFrame(() => previousFocus.current?.focus({ preventScroll: true }));
+    };
+  }, [open]);
+  if (!open || typeof document === "undefined") return null;
+  return createPortal(
+    <div
+      className="sheet-layer"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+      onTouchEnd={(event) => {
+        if (event.target === event.currentTarget) onClose();
       }}
     >
-      <Dialog.Portal>
-        <Dialog.Overlay className="sheet-overlay" />
-        <Dialog.Content className="detail-sheet">
-          <div className="sheet-handle" aria-hidden="true" />
-          <Dialog.Close className="icon-button sheet-close" aria-label="Close details">
-            <X size={21} />
-          </Dialog.Close>
-          <p className="eyebrow">{eyebrow}</p>
-          <Dialog.Title className="sheet-title">{title}</Dialog.Title>
-          <Dialog.Description className="sheet-description">{description}</Dialog.Description>
-          {children}
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      <section
+        className="detail-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="sheet-title"
+        aria-describedby="sheet-description"
+        onMouseDown={(event) => event.stopPropagation()}
+        onTouchStart={(event) => event.stopPropagation()}
+      >
+        <div className="sheet-handle" aria-hidden="true" />
+        <button
+          ref={closeRef}
+          type="button"
+          className="icon-button sheet-close"
+          aria-label="Close details"
+          onClick={onClose}
+        >
+          <X size={21} />
+        </button>
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 id="sheet-title" className="sheet-title">
+          {title}
+        </h2>
+        <p id="sheet-description" className="sheet-description">
+          {description}
+        </p>
+        {children}
+      </section>
+    </div>,
+    document.body,
   );
 }
