@@ -31,6 +31,12 @@ test("sunrise resets fixed units and switches to the first day muhūrta", () => 
   const later = getVedicTime(new Date(anchor.getTime() + 24 * 60000 + 24 * 1000), delhi);
   assert.equal(later.ghati, 1);
   assert.equal(later.pala, 1);
+  const lastVighati = getVedicTime(new Date(anchor.getTime() + 24 * 60000 - 1000), delhi);
+  assert.equal(lastVighati.ghati, 0);
+  assert.equal(lastVighati.pala, 59);
+  const nextGhati = getVedicTime(new Date(anchor.getTime() + 24 * 60000), delhi);
+  assert.equal(nextGhati.ghati, 1);
+  assert.equal(nextGhati.pala, 0);
 });
 test("prahar boundaries are quarters, not groups of four muhūrtas", () => {
   const time = getVedicTime(noon, delhi);

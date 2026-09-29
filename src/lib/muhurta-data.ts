@@ -167,7 +167,7 @@ export const VEDIC_UNITS: VedicUnit[] = [
     plural: "Ahorātras",
     modernEquivalent: "24 hours",
     description:
-      "One complete day-and-night cycle, divided into 30 muhūrtas: 15 from sunrise to sunset, and 15 from sunset to sunrise.",
+      "One sunrise-to-sunrise cycle, divided into 30 seasonal muhūrtas: 15 from sunrise to sunset and 15 from sunset to sunrise.",
   },
   {
     id: "muhurta",
@@ -185,16 +185,16 @@ export const VEDIC_UNITS: VedicUnit[] = [
     plural: "Ghaṭīs",
     modernEquivalent: "24 minutes",
     description:
-      "A fixed 24-minute unit associated with traditional water clocks. Half a fixed muhūrta; independent of seasonal solar divisions.",
+      "A fixed 24-minute unit associated with traditional water clocks. A conventional 24-hour day holds 60 ghaṭīs; the interval from one local sunrise to the next may differ slightly.",
   },
   {
     id: "pala",
-    name: "Pala",
-    devanagari: "पल",
-    plural: "Palas",
+    name: "Vighaṭī / Pala",
+    devanagari: "विघटी / पल",
+    plural: "Vighaṭīs",
     modernEquivalent: "24 seconds",
     description:
-      "One sixtieth of a ghaṭī. There are 60 palas in one ghaṭī and 120 palas in one fixed 48-minute muhūrta.",
+      "One sixtieth of a ghaṭī. Also called pala; 60 vighaṭīs make a ghaṭī and 120 make a fixed 48-minute muhūrta.",
   },
   {
     id: "vipala",

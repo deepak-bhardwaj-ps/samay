@@ -121,7 +121,7 @@ function SettingsPage() {
           onChange={(value) => setPreferences({ showQuality: value })}
         />
         <Preference
-          label="Ghaṭī and pal readout"
+          label="Ghaṭī and vighaṭī readout"
           description="See fixed units counting from sunrise."
           checked={preferences.showSubUnits}
           onChange={(value) => setPreferences({ showSubUnits: value })}
@@ -137,8 +137,8 @@ function SettingsPage() {
             {(
               [
                 ["ghati", "Ghaṭī"],
-                ["pala", "Pal"],
-                ["vipala", "Vipal"],
+                ["pala", "Vighaṭī / pala"],
+                ["vipala", "Vipala"],
               ] as const
             ).map(([key, label]) => (
               <label className="unit-toggle" key={key}>

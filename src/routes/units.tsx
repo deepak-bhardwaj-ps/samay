@@ -31,10 +31,10 @@ const LESSONS = [
     text: "A fixed unit traditionally associated with water clocks. The large ghaṭī count on Today measures elapsed time from the active sunrise. It is independent of the seasonal muhūrta dial.",
   },
   {
-    name: "Pal",
-    script: "पल",
-    measure: "24 seconds · 60 vipal",
-    text: "Also called pala. Sixty pal make one ghaṭī. A pal advances every 24 seconds: a small, perceptible unit that gives familiar minutes a different rhythm. One vipal is 0.4 seconds.",
+    name: "Vighaṭī / Pala",
+    script: "विघटी / पल",
+    measure: "24 seconds · 60 vipala",
+    text: "A vighaṭī, also called pala, is one sixtieth of a ghaṭī. Sixty vighaṭīs make one ghaṭī; sixty vipalas make one vighaṭī. One vipala is 0.4 seconds.",
   },
   {
     name: "Tithi",
@@ -77,6 +77,10 @@ function LearnPage() {
         <h2>Six ideas to start with</h2>
         <span>Tap to explore</span>
       </div>
+      <p className="helper-text">
+        Names use IAST transliteration: ā is a long a, ṭ is a retroflex t, and ṣ is a retroflex sh.
+        Devanāgarī appears alongside each term.
+      </p>
       <div className="lesson-grid">
         {LESSONS.map((lesson, index) => (
           <details className="lesson-card" key={lesson.name}>
@@ -99,7 +103,7 @@ function LearnPage() {
         <p className="eyebrow">Make it familiar</p>
         <h2>A little translation.</h2>
         <label htmlFor="minute-converter" className="helper-text">
-          Move the slider to turn minutes into ghaṭī and pal.
+          Move the slider to turn minutes into ghaṭī and vighaṭī (pala).
         </label>
         <div className="converter-control">
           <input
@@ -114,7 +118,7 @@ function LearnPage() {
           <output htmlFor="minute-converter">{minutes} minutes</output>
         </div>
         <p className="converter-result" aria-live="polite">
-          {ghati} ghaṭī <span className="text-muted-foreground">·</span> {pal} pal
+          {ghati} ghaṭī <span className="text-muted-foreground">·</span> {pal} vighaṭī
         </p>
       </section>
       <Link to="/about" className="text-link">

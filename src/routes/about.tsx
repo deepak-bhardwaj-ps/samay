@@ -48,8 +48,8 @@ function AboutPage() {
           <div>
             <h3>Find your chapter.</h3>
             <p>
-              Use the prahar to recognise your broader part of the day. Notice how its length
-              changes with the season.
+              Use the prahar (प्रहर) to recognise your broader part of the day. Notice how its
+              length changes with the season.
             </p>
           </div>
         </div>
@@ -58,8 +58,8 @@ function AboutPage() {
           <div>
             <h3>Learn one unit.</h3>
             <p>
-              Keep modern time visible while ghaṭī and pal become familiar. There is no need to
-              learn everything at once.
+              Keep modern time visible while ghaṭī (घटी) and vighaṭī (विघटी) become familiar. There
+              is no need to learn everything at once.
             </p>
           </div>
         </div>
@@ -72,15 +72,16 @@ function AboutPage() {
           the time of year.
         </p>
         <p>
-          Ghaṭī, pal and vipal are fixed units: 24 minutes, 24 seconds and 0.4 seconds respectively.
-          A fixed muhūrta is 48 minutes. It should not be confused with the seasonal muhūrtas on the
-          dial.
+          Ghaṭī (घटी), vighaṭī or pala (विघटी / पल), and vipala (विपल) are fixed units: 24 minutes,
+          24 seconds and 0.4 seconds respectively. Sixty ghaṭīs make a conventional 24-hour day;
+          sixty vighaṭīs make a ghaṭī. A fixed muhūrta is 48 minutes. The seasonal muhūrtas on the
+          dial divide daylight and night separately, so their lengths vary.
         </p>
         <p>
-          Tithi, nakshatra, yoga and karaṇa are calculated with Swiss Ephemeris through the Hora
-          library, using Lahiri ayanāṃśa and an offline ephemeris fallback. Vāra follows the local
-          sunrise. Solar events use SunCalc. Small boundary differences between calculation methods
-          are possible.
+          Tithi (तिथि), nakṣatra (नक्षत्र), yoga (योग) and karaṇa (करण) are calculated with Swiss
+          Ephemeris through the Hora library, using Lahiri ayanāṃśa and an offline ephemeris
+          fallback. Vāra follows the local sunrise. Solar events use SunCalc. Small boundary
+          differences between calculation methods are possible.
         </p>
         <p>
           The named muhūrta sequence and qualities follow the Drik Panchang Do Ghati reference.
@@ -100,7 +101,7 @@ function AboutPage() {
           </a>
           <br />
           The named sequence and associated traditional qualities. Samay separately uses fixed ghaṭī
-          and pal for elapsed time.
+          and vighaṭī for elapsed time.
         </p>
         <p>
           <a
@@ -112,6 +113,13 @@ function AboutPage() {
           </a>
           <br />
           Background on traditional time units.
+        </p>
+        <p>
+          <a href="https://ignca.gov.in/Asi_data/34958.pdf" target="_blank" rel="noreferrer">
+            The Indian Calendar · Indira Gandhi National Centre for the Arts
+          </a>
+          <br />
+          Tabulates 60 ghaṭīs per conventional day and 60 palas (vighaṭīs) per ghaṭī.
         </p>
         <p>
           <a href="https://www.npmjs.com/package/@siva-sh/hora" target="_blank" rel="noreferrer">

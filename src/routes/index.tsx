@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Read the present moment through Indian time. A living solar clock with muhūrta, prahar, ghaṭī, pal and the lunar day.",
+          "Read the present moment through Indian time. A living solar clock with muhūrta, prahar, ghaṭī, vighaṭī and tithi.",
       },
     ],
   }),
@@ -149,7 +149,7 @@ function Today() {
             <div className="instrument-meta">
               <span>
                 <i className="live-dot" />
-                LIVE SOLAR TIME
+                SŪRYA KĀLA {preferences.showSanskrit && "· सूर्यकाल"}
               </span>
               <button
                 className="text-button"
@@ -179,8 +179,13 @@ function Today() {
                 15 night
               </span>
               <span>
-                <i className="now-dot" />
-                Now
+                <i className="now-dot" /> Now · muhūrta
+              </span>
+              <span>
+                <i className="ghati-hand-key" /> Ghaṭī
+              </span>
+              <span>
+                <i className="vighati-hand-key" /> Vighaṭī
               </span>
             </div>
             {preferences.showModernRange && (
@@ -226,7 +231,9 @@ function Today() {
                 preferences.visibleUnits.vipala) && (
                 <button className="ghati-card" onClick={() => setSheet("ghati")}>
                   <div className="card-topline">
-                    <span className="eyebrow">Since sunrise</span>
+                    <span className="eyebrow">
+                      Since sunrise {preferences.showSanskrit && "· सूर्योदयात्"}
+                    </span>
                     <ArrowRight size={17} />
                   </div>
                   <div className="traditional-readout">
@@ -234,7 +241,7 @@ function Today() {
                       <div>
                         <strong>{String(time.ghati).padStart(2, "0")}</strong>
                         <span>
-                          Ghaṭī <small>घटी</small>
+                          Ghaṭī {preferences.showSanskrit && <small lang="sa">घटी</small>}
                         </span>
                       </div>
                     )}
@@ -243,19 +250,21 @@ function Today() {
                       <div>
                         <strong>{String(time.pala).padStart(2, "0")}</strong>
                         <span>
-                          Pal <small>पल</small>
+                          Vighaṭī {preferences.showSanskrit && <small lang="sa">विघटी</small>}
                         </span>
                       </div>
                     )}
                     {preferences.visibleUnits.vipala && (
                       <div>
                         <strong>{String(time.vipala).padStart(2, "0")}</strong>
-                        <span>Vipal</span>
+                        <span>
+                          Vipala {preferences.showSanskrit && <small lang="sa">विपल</small>}
+                        </span>
                       </div>
                     )}
                   </div>
                   <div className="unit-equivalence">
-                    1 ghaṭī = 24 minutes <span>·</span> 1 pal = 24 seconds
+                    1 ghaṭī = 60 vighaṭīs <span>·</span> 1 vighaṭī = 24 seconds
                   </div>
                 </button>
               )}
@@ -268,7 +277,9 @@ function Today() {
                 )}
               </div>
               <div className="prahar-copy">
-                <span className="eyebrow">Your current prahar</span>
+                <span className="eyebrow">
+                  Prahar {preferences.showSanskrit && <span lang="sa">· प्रहर</span>}
+                </span>
                 <h3>
                   {time.period === "day" ? "Day" : "Night"} · {prahar?.index} of 4
                 </h3>
@@ -295,7 +306,9 @@ function Today() {
                 <Moon size={36} strokeWidth={0.9} />
               </div>
               <div>
-                <span className="eyebrow">Tithi · the lunar day</span>
+                <span className="eyebrow">
+                  Tithi {preferences.showSanskrit && <span lang="sa">· तिथि</span>} · lunar day
+                </span>
                 <h3>
                   {panchanga?.tithi ??
                     (lunarError ? "Lunar data unavailable" : "Reading the lunar sky…")}
@@ -357,7 +370,10 @@ function Today() {
                     >
                       <span className="timeline-index">{String(m.index).padStart(2, "0")}</span>
                       <span className="timeline-name">
-                        <strong>{m.name}</strong>
+                        <strong>
+                          {m.name}{" "}
+                          {preferences.showSanskrit && <span lang="sa">· {m.devanagari}</span>}
+                        </strong>
                         <small>
                           {clock(range.start)} – {clock(range.end)}
                         </small>
@@ -378,7 +394,11 @@ function Today() {
           setSelected(null);
           if ("speechSynthesis" in globalThis) speechSynthesis.cancel();
         }}
-        eyebrow={window ? `${window.period} muhūrta · ${window.position} of 15` : "Muhūrta"}
+        eyebrow={
+          window
+            ? `${window.period} muhūrta · मुहूर्त · ${window.position} of 15`
+            : "Muhūrta · मुहूर्त"
+        }
         title={info?.name ?? ""}
         description={info?.meaning ?? ""}
       >
@@ -442,12 +462,14 @@ function Today() {
       <DetailSheet
         open={sheet !== null}
         onClose={() => setSheet(null)}
-        eyebrow={sheet === "lunar" ? "Pañcāṅga · five limbs" : "A field guide to time"}
+        eyebrow={
+          sheet === "lunar" ? "Pañcāṅga · पञ्चाङ्ग · five limbs" : "A field guide to time · काल"
+        }
         title={
           sheet === "dial"
             ? "A day, held in a circle."
             : sheet === "ghati"
-              ? "Let the ghaṭī count."
+              ? "Ghaṭī · घटी"
               : sheet === "prahar"
                 ? "The chapters of your day."
                 : "The sky, in this moment."
@@ -456,7 +478,7 @@ function Today() {
           sheet === "dial"
             ? "Begin at the left edge: sunrise. Follow the circle clockwise through daylight, nightfall and the next sunrise."
             : sheet === "ghati"
-              ? "Ghaṭī and pal measure elapsed time from sunrise. These are fixed units, like minutes and seconds."
+              ? "Ghaṭī and vighaṭī (also called pala) measure elapsed time from sunrise in fixed units."
               : sheet === "prahar"
                 ? "A prahar is one quarter of the day or night. Four daytime prahars and four nighttime prahars give your day eight natural chapters."
                 : "The pañcāṅga brings together five astronomical measures. Tithi follows the angle between the Moon and Sun; it does not change at midnight."
@@ -481,8 +503,16 @@ function Today() {
             <div>
               <span>03</span>
               <p>
-                <strong>The moving dot</strong>Your place in the solar day. Tap any outer segment to
-                see its name and time window.
+                <strong>The arrow</strong>Your place in the solar day and active muhūrta. Tap any
+                outer segment to see its name and time window.
+              </p>
+            </div>
+            <div>
+              <span>04</span>
+              <p>
+                <strong>The two hands</strong>Gold counts fixed ghaṭīs from sunrise; pale green
+                sweeps through the 60 vighaṭīs within each ghaṭī. These hands follow fixed time, so
+                they do not always align with the seasonal muhūrta ring.
               </p>
             </div>
           </div>
@@ -490,13 +520,13 @@ function Today() {
         {sheet === "ghati" && (
           <>
             <div className="conversion-display">
-              <span>1 ghaṭī</span>
+              <span>1 ghaṭī · घटी</span>
               <ArrowRight size={20} />
-              <span>60 pal</span>
+              <span>60 vighaṭī · विघटी</span>
             </div>
             <p className="body-copy">
-              One ghaṭī is 24 minutes. One pal (pala) is 24 seconds. One vipal is 0.4 seconds. The
-              count resets at the next local sunrise.
+              A conventional 24-hour day has 60 ghaṭīs. One ghaṭī is 24 minutes; one vighaṭī (pala)
+              is 24 seconds; one vipala is 0.4 seconds. The count starts at local sunrise.
             </p>
             <p className="helper-text">
               The dial uses seasonal muhūrtas. A fixed muhūrta is 48 minutes; a seasonal one is one
@@ -536,15 +566,15 @@ function Today() {
             ) : (
               <dl className="panchanga-list">
                 {[
-                  ["Tithi", "Lunar day", panchanga?.tithi],
-                  ["Vāra", "Solar weekday", panchanga?.vara],
-                  ["Nakshatra", "Lunar mansion", panchanga?.nakshatra],
-                  ["Yoga", "Sun–Moon longitude sum", panchanga?.yoga],
-                  ["Karaṇa", "Half a tithi", panchanga?.karana],
-                ].map(([name, meaning, value]) => (
+                  ["Tithi", "तिथि", "Lunar day", panchanga?.tithi],
+                  ["Vāra", "वार", "Solar weekday", panchanga?.vara],
+                  ["Nakṣatra", "नक्षत्र", "Lunar mansion", panchanga?.nakshatra],
+                  ["Yoga", "योग", "Sun–Moon longitude sum", panchanga?.yoga],
+                  ["Karaṇa", "करण", "Half a tithi", panchanga?.karana],
+                ].map(([name, script, meaning, value]) => (
                   <div key={name}>
                     <dt>
-                      {name}
+                      {name} {preferences.showSanskrit && <span lang="sa">· {script}</span>}
                       <small>{meaning}</small>
                     </dt>
                     <dd>{value ?? "Calculating…"}</dd>

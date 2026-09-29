@@ -415,7 +415,7 @@
 }
 .dial-centre {
   position: absolute;
-  inset: 19% 18%;
+  inset: 25% 24%;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -439,22 +439,22 @@
 }
 .dial-sanskrit {
   font-family: "Tiro Devanagari Sanskrit", serif;
-  font-size: 5.6cqw;
+  font-size: 4.8cqw;
   line-height: 1.2;
-  margin-top: 6cqw;
+  margin-top: 2.4cqw;
   color: #d7bb82;
 }
 .dial-name {
-  font-size: 11.4cqw;
+  font-size: 9.2cqw;
   line-height: 1.1;
   letter-spacing: -0.03em;
   margin-top: 1cqw;
 }
 .dial-name-long {
-  font-size: 8cqw;
+  font-size: 6.5cqw;
 }
 .dial-meaning {
-  max-width: 78%;
+  max-width: 95%;
   font-size: 2.35cqw;
   margin-top: 1.5cqw;
   color: #bdc2ad;
@@ -463,9 +463,22 @@
 .dial-countdown {
   font-size: 2.5cqw;
   color: #e9dcbd;
-  margin-top: 5cqw;
+  margin-top: 1.8cqw;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
+}
+.dial-subtime {
+  color: #e5c487;
+  font-family: "Tiro Devanagari Sanskrit", serif;
+  font-size: 3.1cqw;
+  font-variant-numeric: tabular-nums;
+  margin-top: 2cqw;
+  white-space: nowrap;
+}
+.dial-subtime i {
+  color: #a9c7b9;
+  font-style: normal;
+  margin: 0 0.8cqw;
 }
 .dial-number {
   font-family: "Inter", sans-serif;
@@ -487,6 +500,7 @@
 .dial-legend {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 19px;
   font-size: 9px;
   color: #717a6b;
@@ -496,6 +510,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 .dial-legend i {
   width: 5px;
@@ -509,9 +524,24 @@
   background: #738684;
 }
 .now-dot {
-  background: #294c3c;
-  outline: 1px solid #bcc4b2;
-  outline-offset: 2px;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 7px solid #294c3c;
+  border-radius: 0 !important;
+}
+.ghati-hand-key,
+.vighati-hand-key {
+  width: 11px !important;
+  height: 2px !important;
+  border-radius: 2px !important;
+}
+.ghati-hand-key {
+  background: #d5aa64;
+}
+.vighati-hand-key {
+  background: #88ad9e;
 }
 .modern-time {
   text-align: center;
@@ -874,6 +904,12 @@
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 500;
+}
+.timeline-name strong span {
+  font-family: "Tiro Devanagari Sanskrit", serif;
+  font-size: 0.65em;
+  color: #7b8b70;
+  white-space: nowrap;
 }
 .timeline-name small {
   display: block;
@@ -1875,6 +1911,9 @@
   }
   .dial-legend {
     font-size: 10px;
+    gap: 8px 14px;
+    max-width: 330px;
+    margin: 3px auto 0;
   }
   .modern-time {
     font-size: 16px;

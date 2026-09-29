@@ -19,7 +19,7 @@ function arc(r: number, start: number, end: number) {
     b = point(r, end);
   return `M ${a.x} ${a.y} A ${r} ${r} 0 ${end - start > 180 ? 1 : 0} 1 ${b.x} ${b.y}`;
 }
-/** The geometry is data: 30 proportional muhūrtas, 8 prahars, one live position. */
+/** Solar divisions and fixed units share a face, but use independent scales. */
 export function MandalaClock({
   vedicTime: time,
   now,
@@ -31,7 +31,14 @@ export function MandalaClock({
   const info = getMuhurtaByIndex(selectedIndex ?? time.absoluteIndex);
   const cycle = time.cycleEnd.getTime() - time.cycleStart.getTime();
   const angle = (date: Date) => 270 + ((date.getTime() - time.cycleStart.getTime()) / cycle) * 360;
-  const position = point(173, angle(now));
+  const solarAngle = angle(now);
+  const elapsed = Math.max(0, now.getTime() - time.dayStart.getTime());
+  const ghatiAngle = 270 + (elapsed / 86_400_000) * 360;
+  const vighatiAngle = 270 + ((elapsed % 1_440_000) / 1_440_000) * 360;
+  const markerTip = point(183, solarAngle);
+  const markerBase = point(194, solarAngle);
+  const markerLeft = point(190, solarAngle - 2.4);
+  const markerRight = point(190, solarAngle + 2.4);
   const isExploring = selectedIndex !== null;
   return (
     <div className="mandala-instrument">
@@ -39,7 +46,7 @@ export function MandalaClock({
         viewBox="0 0 400 400"
         className="mandala-frame"
         role="group"
-        aria-label="Solar clock. Outer ring: 30 muhūrtas. Inner ring: 8 prahars. Tap a segment to explore."
+        aria-label={`Solar clock. Outer ring: 30 muhūrtas with an arrow at the current moment. Inner ring: 8 prahars. Ghaṭī hand: ${time.ghati}. Vighaṭī hand: ${time.pala}. Tap an outer segment to explore.`}
       >
         <defs>
           <linearGradient id={`${id}-metal`} x1="0" y1="0" x2="1" y2="1">
@@ -134,14 +141,67 @@ export function MandalaClock({
             />
           );
         })}
-        <g aria-hidden="true" className="dial-pointer">
+        <circle
+          cx={C}
+          cy={C}
+          r="122"
+          fill="none"
+          stroke="#8b9b8d"
+          strokeOpacity=".35"
+          strokeWidth=".7"
+        />
+        {Array.from({ length: 60 }, (_, index) => {
+          const start = point(index % 5 === 0 ? 116 : 119, 270 + index * 6);
+          const end = point(123, 270 + index * 6);
+          return (
+            <line
+              key={index}
+              x1={start.x}
+              y1={start.y}
+              x2={end.x}
+              y2={end.y}
+              stroke="#9bac9c"
+              strokeOpacity={index % 5 === 0 ? ".75" : ".35"}
+              strokeWidth={index % 5 === 0 ? "1.1" : ".65"}
+              aria-hidden="true"
+            />
+          );
+        })}
+        <g aria-hidden="true" className="dial-hands">
+          <line
+            x1={C}
+            y1={C}
+            x2={point(112, ghatiAngle).x}
+            y2={point(112, ghatiAngle).y}
+            stroke="#e5c487"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+          />
+          <line
+            x1={C}
+            y1={C}
+            x2={point(126, vighatiAngle).x}
+            y2={point(126, vighatiAngle).y}
+            stroke="#a9c7b9"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
           <circle
-            cx={position.x}
-            cy={position.y}
-            r="5"
-            fill="#253d35"
-            stroke="#fbf7ec"
-            strokeWidth="2"
+            cx={C}
+            cy={C}
+            r="96"
+            fill="#1b302c"
+            stroke="#6a806f"
+            strokeOpacity=".45"
+            strokeWidth="1"
+          />
+        </g>
+        <g aria-hidden="true" className="dial-pointer">
+          <path
+            d={`M ${markerTip.x} ${markerTip.y} L ${markerLeft.x} ${markerLeft.y} L ${markerBase.x} ${markerBase.y} L ${markerRight.x} ${markerRight.y} Z`}
+            fill="#263f35"
+            stroke="#fff9e9"
+            strokeWidth="1.5"
           />
         </g>
       </svg>
@@ -159,6 +219,12 @@ export function MandalaClock({
           {info.name}
         </h2>
         <span className="dial-meaning">{info.meaning}</span>
+        {!isExploring && (
+          <span className="dial-subtime">
+            {String(time.ghati).padStart(2, "0")} {showSanskrit ? "घटी" : "ghaṭī"} <i>·</i>{" "}
+            {String(time.pala).padStart(2, "0")} {showSanskrit ? "विघटी" : "vighaṭī"}
+          </span>
+        )}
         <span className="dial-countdown">
           {isExploring
             ? `${info.index} of 30 muhūrtas`
