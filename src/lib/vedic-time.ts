@@ -20,6 +20,15 @@ export interface SunriseSunset {
 
 export const MUHURTAS_PER_PERIOD = 15;
 
+/** Angles on the fixed 60-part dial, clockwise from the 00 mark at twelve o'clock. */
+export function getFixedDialAngles(elapsedSinceSunriseMs: number) {
+  const elapsed = Math.max(0, elapsedSinceSunriseMs);
+  return {
+    ghati: ((elapsed / 1_440_000) % 60) * 6,
+    vighati: ((elapsed % 1_440_000) / 24_000) * 6,
+  };
+}
+
 export interface VedicTime {
   /** False when the sun does not rise/set and proportional geometry is unavailable. */
   solarDataAvailable: boolean;

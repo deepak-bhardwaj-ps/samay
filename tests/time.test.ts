@@ -6,6 +6,7 @@ import {
   getMuhurtaWindow,
   getPraharWindow,
   getLocationOffset,
+  getFixedDialAngles,
 } from "../src/lib/vedic-time.ts";
 import { getPanchanga, HoraPanchangaProvider } from "../src/lib/panchanga.ts";
 const delhi = { latitude: 28.6139, longitude: 77.209, timezone: "Asia/Kolkata" };
@@ -37,6 +38,13 @@ test("sunrise resets fixed units and switches to the first day muhūrta", () => 
   const nextGhati = getVedicTime(new Date(anchor.getTime() + 24 * 60000), delhi);
   assert.equal(nextGhati.ghati, 1);
   assert.equal(nextGhati.pala, 0);
+});
+test("fixed dial hands read the same 60-part scale as the ghaṭī and vighaṭī numbers", () => {
+  const elapsed = (35 * 60 + 15) * 24_000;
+  const angles = getFixedDialAngles(elapsed);
+  assert.equal(angles.ghati, 211.5);
+  assert.equal(angles.vighati, 90);
+  assert.deepEqual(getFixedDialAngles(0), { ghati: 0, vighati: 0 });
 });
 test("prahar boundaries are quarters, not groups of four muhūrtas", () => {
   const time = getVedicTime(noon, delhi);

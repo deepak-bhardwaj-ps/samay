@@ -1,5 +1,10 @@
 import { useId } from "react";
-import { getMuhurtaWindow, formatCountdown, type VedicTime } from "@/lib/vedic-time";
+import {
+  getMuhurtaWindow,
+  getFixedDialAngles,
+  formatCountdown,
+  type VedicTime,
+} from "@/lib/vedic-time";
 import { getMuhurtaByIndex } from "@/lib/muhurta-data";
 
 interface MandalaClockProps {
@@ -33,8 +38,7 @@ export function MandalaClock({
   const angle = (date: Date) => 270 + ((date.getTime() - time.cycleStart.getTime()) / cycle) * 360;
   const solarAngle = angle(now);
   const elapsed = Math.max(0, now.getTime() - time.dayStart.getTime());
-  const ghatiAngle = 270 + (elapsed / 86_400_000) * 360;
-  const vighatiAngle = 270 + ((elapsed % 1_440_000) / 1_440_000) * 360;
+  const { ghati: ghatiAngle, vighati: vighatiAngle } = getFixedDialAngles(elapsed);
   // The pointer is seated in the dial's pale index track. Its curved base
   // follows that track while the tip touches the live muhūrta segment.
   const markerTip = point(169, solarAngle);
@@ -47,7 +51,7 @@ export function MandalaClock({
         viewBox="0 0 400 400"
         className="mandala-frame"
         role="group"
-        aria-label={`Solar clock. Outer ring: 30 muhūrtas with an arrow at the current moment. Inner ring: 8 prahars. Ghaṭī hand: ${time.ghati}. Vighaṭī hand: ${time.pala}. Tap an outer segment to explore.`}
+        aria-label={`Solar clock. Outer ring: 30 muhūrtas with an arrow at the current moment. Prahar ring: 8 arcs. Inner numbered scale: 00, 15, 30, 45 on a 60-part cycle. Gold ghaṭī hand: ${time.ghati}. Green vighaṭī hand: ${time.pala}. Tap an outer segment to explore.`}
       >
         <defs>
           <linearGradient id={`${id}-metal`} x1="0" y1="0" x2="1" y2="1">
@@ -152,8 +156,8 @@ export function MandalaClock({
           strokeWidth=".7"
         />
         {Array.from({ length: 60 }, (_, index) => {
-          const start = point(index % 5 === 0 ? 116 : 119, 270 + index * 6);
-          const end = point(123, 270 + index * 6);
+          const start = point(index % 5 === 0 ? 116 : 119, index * 6);
+          const end = point(123, index * 6);
           return (
             <line
               key={index}
@@ -168,12 +172,28 @@ export function MandalaClock({
             />
           );
         })}
+        {[0, 15, 30, 45].map((value) => {
+          const label = point(107, value * 6);
+          return (
+            <text
+              key={value}
+              x={label.x}
+              y={label.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="dial-fixed-number"
+              aria-hidden="true"
+            >
+              {String(value).padStart(2, "0")}
+            </text>
+          );
+        })}
         <g aria-hidden="true" className="dial-hands">
           <line
             x1={C}
             y1={C}
-            x2={point(112, ghatiAngle).x}
-            y2={point(112, ghatiAngle).y}
+            x2={point(126, ghatiAngle).x}
+            y2={point(126, ghatiAngle).y}
             stroke="#e5c487"
             strokeWidth="3.5"
             strokeLinecap="round"

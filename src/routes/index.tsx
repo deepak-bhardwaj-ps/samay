@@ -510,9 +510,10 @@ function Today() {
             <div>
               <span>04</span>
               <p>
-                <strong>The two hands</strong>Gold counts fixed ghaṭīs from sunrise; pale green
-                sweeps through the 60 vighaṭīs within each ghaṭī. These hands follow fixed time, so
-                they do not always align with the seasonal muhūrta ring.
+                <strong>The numbered inner scale</strong>Read both hands against 00 at the top, then
+                15, 30 and 45 clockwise. Gold counts ghaṭīs from sunrise; pale green sweeps through
+                the 60 vighaṭīs within each ghaṭī. This 60-part scale is separate from the outer
+                30-muhūrta ring.
               </p>
             </div>
           </div>

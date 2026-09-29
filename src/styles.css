@@ -486,6 +486,14 @@
   fill: #7a6d56;
   pointer-events: none;
 }
+.dial-fixed-number {
+  font-family: "Inter", sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  fill: #d1d9c8;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
 .dial-hit {
   cursor: pointer;
   outline: none;
