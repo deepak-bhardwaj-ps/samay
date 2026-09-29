@@ -35,10 +35,11 @@ export function MandalaClock({
   const elapsed = Math.max(0, now.getTime() - time.dayStart.getTime());
   const ghatiAngle = 270 + (elapsed / 86_400_000) * 360;
   const vighatiAngle = 270 + ((elapsed % 1_440_000) / 1_440_000) * 360;
-  const markerTip = point(183, solarAngle);
-  const markerBase = point(194, solarAngle);
-  const markerLeft = point(190, solarAngle - 2.4);
-  const markerRight = point(190, solarAngle + 2.4);
+  // The pointer is seated in the dial's pale index track. Its curved base
+  // follows that track while the tip touches the live muhūrta segment.
+  const markerTip = point(169, solarAngle);
+  const markerLeft = point(181, solarAngle - 2.8);
+  const markerRight = point(181, solarAngle + 2.8);
   const isExploring = selectedIndex !== null;
   return (
     <div className="mandala-instrument">
@@ -198,10 +199,17 @@ export function MandalaClock({
         </g>
         <g aria-hidden="true" className="dial-pointer">
           <path
-            d={`M ${markerTip.x} ${markerTip.y} L ${markerLeft.x} ${markerLeft.y} L ${markerBase.x} ${markerBase.y} L ${markerRight.x} ${markerRight.y} Z`}
-            fill="#263f35"
-            stroke="#fff9e9"
-            strokeWidth="1.5"
+            d={`M ${markerTip.x} ${markerTip.y} L ${markerLeft.x} ${markerLeft.y} A 181 181 0 0 1 ${markerRight.x} ${markerRight.y} Z`}
+            fill="#294438"
+            stroke="#bb9a60"
+            strokeWidth="1.1"
+            strokeLinejoin="round"
+          />
+          <path
+            d={arc(181, solarAngle - 2.8, solarAngle + 2.8)}
+            fill="none"
+            stroke="#e3c994"
+            strokeWidth="1.3"
           />
         </g>
       </svg>
