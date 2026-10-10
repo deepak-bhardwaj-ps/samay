@@ -64,6 +64,12 @@ declare module "suncalc3" {
       azimuth: number;
       altitude: number;
     };
+    getMoonTimes: (
+      dateValue: Date,
+      lat: number,
+      lng: number,
+      inUTC?: boolean,
+    ) => { moonrise?: SunTimeDef; moonset?: SunTimeDef };
   }
 
   const SunCalc: SunCalcInstance;

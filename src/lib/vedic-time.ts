@@ -18,6 +18,11 @@ export interface SunriseSunset {
   prevSunset: Date;
 }
 
+export interface MoonriseMoonset {
+  moonrise: Date | null;
+  moonset: Date | null;
+}
+
 export const MUHURTAS_PER_PERIOD = 15;
 
 /** Angles on the fixed 60-part dial, clockwise from the 00 mark at twelve o'clock. */
@@ -188,6 +193,21 @@ export function getSunriseSunset(date: Date, location: GeoLocation): SunriseSuns
   if (solarCache.size > 16) solarCache.clear();
   solarCache.set(key, result);
   return result;
+}
+
+/** Moon events for the location's local civil date. Null means no event occurs that date. */
+export function getMoonriseMoonset(date: Date, location: GeoLocation): MoonriseMoonset {
+  const local = applyTimezoneOffset(date, getLocationOffset(date, location));
+  const localNoonUtc = new Date(
+    Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate(), 12),
+  );
+  const events = SunCalc.getMoonTimes(localNoonUtc, location.latitude, location.longitude, true);
+  const validEvent = (event: { value: Date; valid: boolean } | undefined): Date | null =>
+    event?.valid && Number.isFinite(event.value.getTime()) ? event.value : null;
+  return {
+    moonrise: validEvent(events.moonrise),
+    moonset: validEvent(events.moonset),
+  };
 }
 
 export function getVedicTime(date: Date, location: GeoLocation): VedicTime {
@@ -385,11 +405,29 @@ export function formatCountdown(ms: number): string {
 }
 
 export function isBrahmaMuhurta(date: Date, location: GeoLocation): boolean {
-  const { sunrise } = getSunriseSunset(date, location);
-  if (!Number.isFinite(sunrise.getTime())) return false;
-  const brahmaStart = new Date(sunrise.getTime() - 96 * 60 * 1000); // 96 minutes before sunrise
-  const brahmaEnd = new Date(sunrise.getTime() - 48 * 60 * 1000);
-  return date >= brahmaStart && date < brahmaEnd;
+  const window = getBrahmaMuhurta(date, location);
+  return window !== null && date >= window.start && date < window.end;
+}
+
+/** The second-last seasonal night muhūrta before sunrise. */
+export function getBrahmaMuhurta(
+  date: Date,
+  location: GeoLocation,
+): { start: Date; end: Date } | null {
+  const { sunrise, sunset, nextSunrise, prevSunset } = getSunriseSunset(date, location);
+  const currentCycleIsNight = date < sunrise;
+  const targetSunrise = currentCycleIsNight ? sunrise : nextSunrise;
+  const nightStart = currentCycleIsNight ? prevSunset : sunset;
+  if (
+    !Number.isFinite(targetSunrise.getTime()) ||
+    !Number.isFinite(nightStart.getTime()) ||
+    nightStart >= targetSunrise
+  )
+    return null;
+  const nightMuhurtaLength = (targetSunrise.getTime() - nightStart.getTime()) / MUHURTAS_PER_PERIOD;
+  const start = new Date(targetSunrise.getTime() - 2 * nightMuhurtaLength);
+  const end = new Date(targetSunrise.getTime() - nightMuhurtaLength);
+  return { start, end };
 }
 
 export function getAbhijitMuhurta(

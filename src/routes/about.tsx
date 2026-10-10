@@ -69,7 +69,8 @@ function AboutPage() {
         <p>
           The solar dial divides daylight and night into fifteen muhūrtas each. Each half also
           contains four prahars. These are seasonal divisions: they change with your location and
-          the time of year.
+          the time of year. Brahma muhūrta is the second-last of the fifteen night muhūrtas before
+          sunrise, so its duration changes with the season.
         </p>
         <p>
           Ghaṭī (घटी), vighaṭī or pala (विघटी / पल), and vipala (विपल) are fixed units: 24 minutes,
@@ -80,8 +81,8 @@ function AboutPage() {
         <p>
           Tithi (तिथि), nakṣatra (नक्षत्र), yoga (योग) and karaṇa (करण) are calculated with Swiss
           Ephemeris through the Hora library, using Lahiri ayanāṃśa and an offline ephemeris
-          fallback. Vāra follows the local sunrise. Solar events use SunCalc. Small boundary
-          differences between calculation methods are possible.
+          fallback. Vāra follows the local sunrise. Solar and lunar rise/set events use SunCalc.
+          Small boundary differences between calculation methods are possible.
         </p>
         <p>
           The named muhūrta sequence and qualities follow the Drik Panchang Do Ghati reference.

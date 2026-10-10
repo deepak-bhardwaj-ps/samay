@@ -7,7 +7,9 @@ import {
   getPraharWindow,
   getLocationOffset,
   getFixedDialAngles,
+  getBrahmaMuhurta,
 } from "../src/lib/vedic-time.ts";
+import { DAY_NIGHT_MUHURTAS } from "../src/lib/muhurta-data.ts";
 import { getPanchanga, HoraPanchangaProvider } from "../src/lib/panchanga.ts";
 const delhi = { latitude: 28.6139, longitude: 77.209, timezone: "Asia/Kolkata" };
 const noon = new Date("2026-09-09T07:00:00Z");
@@ -20,6 +22,51 @@ test("all 30 windows partition the active sunrise-to-sunrise cycle", () => {
   for (let i = 1; i < 30; i++)
     assert.ok(Math.abs(windows[i]!.start.getTime() - windows[i - 1]!.end.getTime()) <= 1);
   assert.notEqual(windows[0]!.duration, windows[15]!.duration);
+});
+test("the named Do Ghati order matches the selected reference and Brahma is night slot 14", () => {
+  assert.deepEqual(
+    DAY_NIGHT_MUHURTAS.map(({ name }) => name),
+    [
+      "Rudra",
+      "Uraga",
+      "Mitra",
+      "Pitara",
+      "Vasu",
+      "Ambu",
+      "Viśvedeva",
+      "Vidhi",
+      "Brahmā",
+      "Indra",
+      "Indrāgni",
+      "Daitya",
+      "Varuṇa",
+      "Aryamā",
+      "Bhaga",
+      "Īśvara",
+      "Ajaikapāda",
+      "Ahirbudhnya",
+      "Pūṣā",
+      "Aśvinī",
+      "Yama",
+      "Agni",
+      "Brahmā",
+      "Candra",
+      "Aditi",
+      "Bṛhaspati",
+      "Viṣṇu",
+      "Sūrya",
+      "Tvaṣṭā",
+      "Samīraṇa",
+    ],
+  );
+  const time = getVedicTime(noon, delhi);
+  const brahma = getBrahmaMuhurta(noon, delhi)!;
+  const secondLastNightSlot = getMuhurtaWindow(time, 29);
+  assert.equal(brahma.start.getTime(), secondLastNightSlot.start.getTime());
+  assert.equal(brahma.end.getTime(), secondLastNightSlot.end.getTime());
+  assert.ok(
+    Math.abs(brahma.end.getTime() - (time.cycleEnd.getTime() - time.nightLength / 15)) <= 1,
+  );
 });
 test("sunrise resets fixed units and switches to the first day muhūrta", () => {
   const anchor = getVedicTime(noon, delhi).sunrise;

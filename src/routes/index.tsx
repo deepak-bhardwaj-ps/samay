@@ -24,6 +24,8 @@ import {
   formatTime,
   formatDuration,
   formatCountdown,
+  getBrahmaMuhurta,
+  getMoonriseMoonset,
 } from "@/lib/vedic-time";
 import { getMuhurtaByIndex, qualityLabel, DAY_NIGHT_MUHURTAS } from "@/lib/muhurta-data";
 
@@ -52,6 +54,8 @@ function Today() {
   const [speechStatus, setSpeechStatus] = useState("");
   const ready = time?.solarDataAvailable && now;
   const prahar = ready ? getPraharWindow(time, now) : null;
+  const brahma = ready ? getBrahmaMuhurta(now, location) : null;
+  const moonEvents = ready ? getMoonriseMoonset(now, location) : null;
   const info = selected !== null ? getMuhurtaByIndex(selected) : null;
   const window = ready && selected !== null ? getMuhurtaWindow(time, selected) : null;
   const clock = (date: Date) => formatTime(date, time?.timezoneOffset);
@@ -208,6 +212,31 @@ function Today() {
                 </span>
               </div>
             </div>
+            <div className="solar-anchors lunar-anchors" aria-label="Moonrise and moonset">
+              <div>
+                <Moon size={20} />
+                <span>
+                  Moonrise
+                  <strong>{moonEvents?.moonrise ? eventTime(moonEvents.moonrise) : "—"}</strong>
+                </span>
+              </div>
+              <span className="solar-anchor-line" />
+              <div>
+                <Moon size={20} />
+                <span>
+                  Moonset
+                  <strong>{moonEvents?.moonset ? eventTime(moonEvents.moonset) : "—"}</strong>
+                </span>
+              </div>
+            </div>
+            {brahma && (
+              <div className="brahma-window">
+                <span>Brahma muhūrta · second-last seasonal night muhūrta before sunrise</span>
+                <strong>
+                  {clock(brahma.start)} – {clock(brahma.end)}
+                </strong>
+              </div>
+            )}
             <button
               className="next-moment"
               onClick={() =>
@@ -379,6 +408,7 @@ function Today() {
                         </small>
                       </span>
                       {active && <span className="now-badge">NOW</span>}
+                      {m.index === 29 && <span className="now-badge brahma-badge">BRAHMA</span>}
                       <ChevronRight size={15} />
                     </button>
                   );

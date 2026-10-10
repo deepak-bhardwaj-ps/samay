@@ -597,6 +597,28 @@
   height: 1px;
   background: #dedfd3;
 }
+.brahma-window {
+  margin: 14px 8px 0;
+  padding: 11px 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #e4decc;
+  border-radius: 12px;
+  background: #f4f1e8;
+  color: #6e715f;
+  font-size: 10px;
+}
+.brahma-window strong {
+  color: #344c3b;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.lunar-anchors {
+  margin-top: 13px;
+}
 .next-moment {
   display: flex;
   width: calc(100% - 30px);
@@ -932,6 +954,10 @@
   font-size: 8px;
   color: #61774d;
   letter-spacing: 0.1em;
+}
+.brahma-badge {
+  color: #98733d;
+  white-space: nowrap;
 }
 .sheet-layer {
   position: fixed;
@@ -1615,6 +1641,16 @@
   .solar-anchors {
     margin: 21px 5px 0;
     gap: 18px;
+  }
+  .brahma-window {
+    margin: 13px 5px 0;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 9px;
+  }
+  .brahma-window strong {
+    font-size: 13px;
   }
   .solar-anchors strong {
     font-size: 11px;
