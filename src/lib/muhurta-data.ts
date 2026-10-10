@@ -3,7 +3,7 @@ export interface MuhurtaInfo {
   name: string;
   devanagari?: string;
   meaning: string;
-  quality: "auspicious" | "neutral" | "inauspicious" | "variable";
+  quality: "auspicious" | "highly-auspicious" | "neutral" | "inauspicious" | "variable";
   notes?: string;
 }
 
@@ -16,55 +16,67 @@ export interface VedicUnit {
   description: string;
 }
 
-// Named sequence and qualities: Drik Panchang Do Ghati Muhurat reference.
-// https://www.drikpanchang.com/muhurat/daily/do-ghati-muhurat.html
+// Named sequence and qualities follow the BooksFact day/night list.
+// https://www.booksfact.com/puranas/muhurtas-described-ramayana.html
 export const DAY_NIGHT_MUHURTAS: MuhurtaInfo[] = [
   {
     index: 1,
     name: "Rudra",
     devanagari: "रुद्र",
-    meaning: "The fierce one",
+    meaning: "Cryer; howler",
     quality: "inauspicious",
   },
-  { index: 2, name: "Uraga", devanagari: "उरग", meaning: "Serpent", quality: "inauspicious" },
-  { index: 3, name: "Mitra", devanagari: "मित्र", meaning: "Friendship", quality: "auspicious" },
-  { index: 4, name: "Pitara", devanagari: "पितर", meaning: "Ancestors", quality: "inauspicious" },
-  { index: 5, name: "Vasu", devanagari: "वसु", meaning: "Radiance", quality: "auspicious" },
-  { index: 6, name: "Ambu", devanagari: "अम्बु", meaning: "Water", quality: "auspicious" },
+  {
+    index: 2,
+    name: "Āhi / Sarpa",
+    devanagari: "आहि / सर्प",
+    meaning: "Serpent",
+    quality: "inauspicious",
+  },
+  { index: 3, name: "Mitra", devanagari: "मित्र", meaning: "Friend", quality: "auspicious" },
+  { index: 4, name: "Pitṛ", devanagari: "पितृ", meaning: "Ancestor", quality: "inauspicious" },
+  { index: 5, name: "Vasu", devanagari: "वसु", meaning: "Bright", quality: "auspicious" },
+  { index: 6, name: "Vārāha", devanagari: "वाराह / वराह", meaning: "Boar", quality: "auspicious" },
   {
     index: 7,
-    name: "Viśvedeva",
-    devanagari: "विश्वेदेव",
+    name: "Viśvedevā",
+    devanagari: "विश्वेदेवा",
     meaning: "The universal deities",
     quality: "auspicious",
   },
-  { index: 8, name: "Vidhi", devanagari: "विधि", meaning: "Order", quality: "auspicious" },
+  {
+    index: 8,
+    name: "Vidhi / Abhijit",
+    devanagari: "विधि / अभिजित",
+    meaning: "Insight; midday",
+    quality: "highly-auspicious",
+  },
   {
     index: 9,
-    name: "Brahmā",
-    devanagari: "ब्रह्मा",
-    meaning: "The creator",
+    name: "Sutamukhī",
+    devanagari: "सतमुखी",
+    meaning: "Goat or charioteer face",
     quality: "auspicious",
   },
   {
     index: 10,
-    name: "Indra",
-    devanagari: "इन्द्र",
-    meaning: "Lord of the heavens",
-    quality: "auspicious",
+    name: "Puruhūta / Indra",
+    devanagari: "पुरुहूत / इन्द्र",
+    meaning: "Many offerings",
+    quality: "inauspicious",
   },
   {
     index: 11,
-    name: "Indrāgni",
-    devanagari: "इन्द्राग्नी",
-    meaning: "Indra and Agni",
+    name: "Vāhinī / Vinda",
+    devanagari: "वाहिनी / विन्दा",
+    meaning: "Possessed of a chariot",
     quality: "inauspicious",
   },
   {
     index: 12,
-    name: "Daitya",
-    devanagari: "दैत्य",
-    meaning: "Descendant of Diti",
+    name: "Naktanakarā",
+    devanagari: "नक्तनकरा",
+    meaning: "Night maker",
     quality: "inauspicious",
   },
   {
@@ -76,23 +88,23 @@ export const DAY_NIGHT_MUHURTAS: MuhurtaInfo[] = [
   },
   {
     index: 14,
-    name: "Aryamā",
-    devanagari: "अर्यमा",
-    meaning: "Companionship",
+    name: "Aryamā / Aryaman",
+    devanagari: "अर्यमा / अर्यमन्",
+    meaning: "Nobility",
     quality: "auspicious",
   },
   { index: 15, name: "Bhaga", devanagari: "भग", meaning: "The bestower", quality: "inauspicious" },
   {
     index: 16,
-    name: "Īśvara",
-    devanagari: "ईश्वर",
-    meaning: "The sovereign",
+    name: "Girīśa / Īśa",
+    devanagari: "गिरीश / ईश",
+    meaning: "Lord of the mountain",
     quality: "inauspicious",
   },
   {
     index: 17,
-    name: "Ajaikapāda",
-    devanagari: "अजैकपाद",
+    name: "Ajapāda / Ajaikapāda",
+    devanagari: "अजपाद / अजैकपाद",
     meaning: "The one-footed one",
     quality: "inauspicious",
   },
@@ -103,7 +115,13 @@ export const DAY_NIGHT_MUHURTAS: MuhurtaInfo[] = [
     meaning: "Serpent of the deep",
     quality: "auspicious",
   },
-  { index: 19, name: "Pūṣā", devanagari: "पूषा", meaning: "The nourisher", quality: "auspicious" },
+  {
+    index: 19,
+    name: "Puṣya / Pūṣan",
+    devanagari: "पुष्य / पूषा",
+    meaning: "The nourisher",
+    quality: "auspicious",
+  },
   {
     index: 20,
     name: "Aśvinī",
@@ -112,15 +130,15 @@ export const DAY_NIGHT_MUHURTAS: MuhurtaInfo[] = [
     quality: "auspicious",
   },
   { index: 21, name: "Yama", devanagari: "यम", meaning: "Restraint", quality: "inauspicious" },
-  { index: 22, name: "Agni", devanagari: "अग्नि", meaning: "Fire", quality: "inauspicious" },
+  { index: 22, name: "Agni", devanagari: "अग्नि", meaning: "Fire", quality: "auspicious" },
   {
     index: 23,
-    name: "Brahmā",
-    devanagari: "ब्रह्मा",
-    meaning: "The creator",
+    name: "Vidhātṛ",
+    devanagari: "विधातृ",
+    meaning: "The ordainer",
     quality: "auspicious",
   },
-  { index: 24, name: "Candra", devanagari: "चन्द्र", meaning: "The Moon", quality: "auspicious" },
+  { index: 24, name: "Kaṇḍa", devanagari: "कण्ड", meaning: "The cluster", quality: "auspicious" },
   {
     index: 25,
     name: "Aditi",
@@ -130,10 +148,11 @@ export const DAY_NIGHT_MUHURTAS: MuhurtaInfo[] = [
   },
   {
     index: 26,
-    name: "Bṛhaspati",
-    devanagari: "बृहस्पति",
-    meaning: "The teacher",
-    quality: "auspicious",
+    name: "Jīva / Amṛta",
+    devanagari: "जीव / अमृत",
+    meaning: "Life; nectar",
+    quality: "highly-auspicious",
+    notes: "Atiśubha — especially auspicious.",
   },
   {
     index: 27,
@@ -142,19 +161,25 @@ export const DAY_NIGHT_MUHURTAS: MuhurtaInfo[] = [
     meaning: "The preserver",
     quality: "auspicious",
   },
-  { index: 28, name: "Sūrya", devanagari: "सूर्य", meaning: "The Sun", quality: "auspicious" },
+  {
+    index: 28,
+    name: "Dyumadgadyuti / Arka",
+    devanagari: "द्युमद्गद्युति / अर्क",
+    meaning: "Radiant Sun",
+    quality: "auspicious",
+  },
   {
     index: 29,
-    name: "Tvaṣṭā",
-    devanagari: "त्वष्टा",
-    meaning: "The craftsman",
+    name: "Brahma",
+    devanagari: "ब्रह्म",
+    meaning: "The creator",
     quality: "auspicious",
   },
   {
     index: 30,
-    name: "Samīraṇa",
-    devanagari: "समीरण",
-    meaning: "The breeze",
+    name: "Samudram / Vāyu",
+    devanagari: "समुद्रम / वायु",
+    meaning: "Ocean; wind",
     quality: "auspicious",
   },
 ];
@@ -214,6 +239,8 @@ export function qualityLabel(quality: MuhurtaInfo["quality"]): string {
   switch (quality) {
     case "auspicious":
       return "Śubha — auspicious";
+    case "highly-auspicious":
+      return "Atiśubha — highly auspicious";
     case "inauspicious":
       return "Aśubha — avoid beginnings";
     case "variable":
@@ -226,6 +253,7 @@ export function qualityLabel(quality: MuhurtaInfo["quality"]): string {
 export function qualityColorClass(quality: MuhurtaInfo["quality"]): string {
   switch (quality) {
     case "auspicious":
+    case "highly-auspicious":
       return "text-emerald-700 dark:text-emerald-400";
     case "inauspicious":
       return "text-rose-700 dark:text-rose-400";

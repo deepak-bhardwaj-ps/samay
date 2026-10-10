@@ -22,45 +22,48 @@ test("all 30 windows partition the active sunrise-to-sunrise cycle", () => {
     assert.ok(Math.abs(windows[i]!.start.getTime() - windows[i - 1]!.end.getTime()) <= 1);
   assert.notEqual(windows[0]!.duration, windows[15]!.duration);
 });
-test("the named Do Ghati order matches the selected reference", () => {
+test("the day and night muhūrta order matches the selected reference", () => {
   assert.deepEqual(
     DAY_NIGHT_MUHURTAS.map(({ name }) => name),
     [
       "Rudra",
-      "Uraga",
+      "Āhi / Sarpa",
       "Mitra",
-      "Pitara",
+      "Pitṛ",
       "Vasu",
-      "Ambu",
-      "Viśvedeva",
-      "Vidhi",
-      "Brahmā",
-      "Indra",
-      "Indrāgni",
-      "Daitya",
+      "Vārāha",
+      "Viśvedevā",
+      "Vidhi / Abhijit",
+      "Sutamukhī",
+      "Puruhūta / Indra",
+      "Vāhinī / Vinda",
+      "Naktanakarā",
       "Varuṇa",
-      "Aryamā",
+      "Aryamā / Aryaman",
       "Bhaga",
-      "Īśvara",
-      "Ajaikapāda",
+      "Girīśa / Īśa",
+      "Ajapāda / Ajaikapāda",
       "Ahirbudhnya",
-      "Pūṣā",
+      "Puṣya / Pūṣan",
       "Aśvinī",
       "Yama",
       "Agni",
-      "Brahmā",
-      "Candra",
+      "Vidhātṛ",
+      "Kaṇḍa",
       "Aditi",
-      "Bṛhaspati",
+      "Jīva / Amṛta",
       "Viṣṇu",
-      "Sūrya",
-      "Tvaṣṭā",
-      "Samīraṇa",
+      "Dyumadgadyuti / Arka",
+      "Brahma",
+      "Samudram / Vāyu",
     ],
   );
-  assert.equal(DAY_NIGHT_MUHURTAS[27]!.name, "Sūrya");
-  assert.equal(DAY_NIGHT_MUHURTAS[28]!.name, "Tvaṣṭā");
-  assert.equal(DAY_NIGHT_MUHURTAS[29]!.name, "Samīraṇa");
+  assert.equal(DAY_NIGHT_MUHURTAS[27]!.name, "Dyumadgadyuti / Arka");
+  assert.equal(DAY_NIGHT_MUHURTAS[28]!.name, "Brahma");
+  assert.equal(DAY_NIGHT_MUHURTAS[29]!.name, "Samudram / Vāyu");
+  assert.equal(DAY_NIGHT_MUHURTAS[7]!.quality, "highly-auspicious");
+  assert.equal(DAY_NIGHT_MUHURTAS[25]!.quality, "highly-auspicious");
+  assert.equal(DAY_NIGHT_MUHURTAS[21]!.quality, "auspicious");
   const time = getVedicTime(noon, delhi);
   const penultimateWindow = getMuhurtaWindow(time, 29);
   const lastWindow = getMuhurtaWindow(time, 30);

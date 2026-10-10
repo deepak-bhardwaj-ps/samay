@@ -84,24 +84,24 @@ function AboutPage() {
           Small boundary differences between calculation methods are possible.
         </p>
         <p>
-          The named muhūrta sequence and qualities follow the Drik Panchang Do Ghati reference.
-          Names and traditional associations are a cultural reference. They vary across texts and
-          communities; Samay does not present them as universal prescriptions.
+          The named day and night sequence and traditional qualities follow the BooksFact list
+          below. Names and associations vary across texts and communities; Samay does not present
+          them as universal prescriptions. The standard example times in the source are scaled to
+          each local daylight and night period.
         </p>
       </section>
       <section className="reading-section">
         <h2>Sources & conventions</h2>
         <p>
           <a
-            href="https://www.drikpanchang.com/muhurat/daily/do-ghati-muhurat.html"
+            href="https://www.booksfact.com/puranas/muhurtas-described-ramayana.html"
             target="_blank"
             rel="noreferrer"
           >
-            Drik Panchang · Do Ghati muhūrta names
+            BooksFact · Muhūrtas described in the Rāmāyaṇa
           </a>
           <br />
-          The named sequence and associated traditional qualities. Samay separately uses fixed ghaṭī
-          and vighaṭī for elapsed time.
+          The 30-name order and traditional qualities used by Samay.
         </p>
         <p>
           <a
