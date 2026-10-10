@@ -404,32 +404,6 @@ export function formatCountdown(ms: number): string {
   return `${s}s`;
 }
 
-export function isBrahmaMuhurta(date: Date, location: GeoLocation): boolean {
-  const window = getBrahmaMuhurta(date, location);
-  return window !== null && date >= window.start && date < window.end;
-}
-
-/** The second-last seasonal night muhūrta before sunrise. */
-export function getBrahmaMuhurta(
-  date: Date,
-  location: GeoLocation,
-): { start: Date; end: Date } | null {
-  const { sunrise, sunset, nextSunrise, prevSunset } = getSunriseSunset(date, location);
-  const currentCycleIsNight = date < sunrise;
-  const targetSunrise = currentCycleIsNight ? sunrise : nextSunrise;
-  const nightStart = currentCycleIsNight ? prevSunset : sunset;
-  if (
-    !Number.isFinite(targetSunrise.getTime()) ||
-    !Number.isFinite(nightStart.getTime()) ||
-    nightStart >= targetSunrise
-  )
-    return null;
-  const nightMuhurtaLength = (targetSunrise.getTime() - nightStart.getTime()) / MUHURTAS_PER_PERIOD;
-  const start = new Date(targetSunrise.getTime() - 2 * nightMuhurtaLength);
-  const end = new Date(targetSunrise.getTime() - nightMuhurtaLength);
-  return { start, end };
-}
-
 export function getAbhijitMuhurta(
   date: Date,
   location: GeoLocation,

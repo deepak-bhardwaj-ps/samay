@@ -174,7 +174,7 @@ export const VEDIC_UNITS: VedicUnit[] = [
     name: "Muhūrta",
     devanagari: "मुहूर्त",
     plural: "Muhūrtas",
-    modernEquivalent: "~48 minutes (varies with sunrise/sunset)",
+    modernEquivalent: "Varies with daylight or night length",
     description:
       "The fundamental Vedic hour. Daylight is divided into 15 muhūrtas and the night into 15 more, measured separately, so a day muhūrta and a night muhūrta are rarely the same length.",
   },
@@ -193,8 +193,7 @@ export const VEDIC_UNITS: VedicUnit[] = [
     devanagari: "विघटी / पल",
     plural: "Vighaṭīs",
     modernEquivalent: "24 seconds",
-    description:
-      "One sixtieth of a ghaṭī. Also called pala; 60 vighaṭīs make a ghaṭī and 120 make a fixed 48-minute muhūrta.",
+    description: "One sixtieth of a ghaṭī. Also called pala; 60 vighaṭīs make one ghaṭī.",
   },
   {
     id: "vipala",

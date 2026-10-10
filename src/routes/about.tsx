@@ -69,14 +69,13 @@ function AboutPage() {
         <p>
           The solar dial divides daylight and night into fifteen muhūrtas each. Each half also
           contains four prahars. These are seasonal divisions: they change with your location and
-          the time of year. Brahma muhūrta is the second-last of the fifteen night muhūrtas before
-          sunrise, so its duration changes with the season.
+          the time of year.
         </p>
         <p>
           Ghaṭī (घटी), vighaṭī or pala (विघटी / पल), and vipala (विपल) are fixed units: 24 minutes,
           24 seconds and 0.4 seconds respectively. Sixty ghaṭīs make a conventional 24-hour day;
-          sixty vighaṭīs make a ghaṭī. A fixed muhūrta is 48 minutes. The seasonal muhūrtas on the
-          dial divide daylight and night separately, so their lengths vary.
+          sixty vighaṭīs make a ghaṭī. The muhūrtas on the dial divide daylight and night
+          separately, so their lengths vary.
         </p>
         <p>
           Tithi (तिथि), nakṣatra (नक्षत्र), yoga (योग) and karaṇa (करण) are calculated with Swiss

@@ -7,7 +7,6 @@ import {
   getPraharWindow,
   getLocationOffset,
   getFixedDialAngles,
-  getBrahmaMuhurta,
 } from "../src/lib/vedic-time.ts";
 import { DAY_NIGHT_MUHURTAS } from "../src/lib/muhurta-data.ts";
 import { getPanchanga, HoraPanchangaProvider } from "../src/lib/panchanga.ts";
@@ -23,7 +22,7 @@ test("all 30 windows partition the active sunrise-to-sunrise cycle", () => {
     assert.ok(Math.abs(windows[i]!.start.getTime() - windows[i - 1]!.end.getTime()) <= 1);
   assert.notEqual(windows[0]!.duration, windows[15]!.duration);
 });
-test("the named Do Ghati order matches the selected reference and Brahma is night slot 14", () => {
+test("the named Do Ghati order matches the selected reference", () => {
   assert.deepEqual(
     DAY_NIGHT_MUHURTAS.map(({ name }) => name),
     [
@@ -59,14 +58,15 @@ test("the named Do Ghati order matches the selected reference and Brahma is nigh
       "Samīraṇa",
     ],
   );
+  assert.equal(DAY_NIGHT_MUHURTAS[27]!.name, "Sūrya");
+  assert.equal(DAY_NIGHT_MUHURTAS[28]!.name, "Tvaṣṭā");
+  assert.equal(DAY_NIGHT_MUHURTAS[29]!.name, "Samīraṇa");
   const time = getVedicTime(noon, delhi);
-  const brahma = getBrahmaMuhurta(noon, delhi)!;
-  const secondLastNightSlot = getMuhurtaWindow(time, 29);
-  assert.equal(brahma.start.getTime(), secondLastNightSlot.start.getTime());
-  assert.equal(brahma.end.getTime(), secondLastNightSlot.end.getTime());
-  assert.ok(
-    Math.abs(brahma.end.getTime() - (time.cycleEnd.getTime() - time.nightLength / 15)) <= 1,
-  );
+  const penultimateWindow = getMuhurtaWindow(time, 29);
+  const lastWindow = getMuhurtaWindow(time, 30);
+  assert.equal(penultimateWindow.end.getTime(), lastWindow.start.getTime());
+  assert.ok(Math.abs(lastWindow.end.getTime() - time.cycleEnd.getTime()) <= 1);
+  assert.equal(penultimateWindow.duration, time.nightLength / 15);
 });
 test("sunrise resets fixed units and switches to the first day muhūrta", () => {
   const anchor = getVedicTime(noon, delhi).sunrise;

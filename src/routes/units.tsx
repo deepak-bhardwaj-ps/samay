@@ -22,7 +22,7 @@ const LESSONS = [
     name: "Muhūrta",
     script: "मुहूर्त",
     measure: "15 in the day · 15 in the night",
-    text: "The clock uses seasonal muhūrtas: each is one fifteenth of daylight or night. Their duration changes through the year. The fixed traditional unit called a muhūrta is 48 minutes, or two ghaṭīs; it is a different convention.",
+    text: "The clock uses seasonal muhūrtas: each is one fifteenth of daylight or night. Their duration changes through the year and with your location.",
   },
   {
     name: "Ghaṭī",

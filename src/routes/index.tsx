@@ -24,7 +24,6 @@ import {
   formatTime,
   formatDuration,
   formatCountdown,
-  getBrahmaMuhurta,
   getMoonriseMoonset,
 } from "@/lib/vedic-time";
 import { getMuhurtaByIndex, qualityLabel, DAY_NIGHT_MUHURTAS } from "@/lib/muhurta-data";
@@ -54,7 +53,6 @@ function Today() {
   const [speechStatus, setSpeechStatus] = useState("");
   const ready = time?.solarDataAvailable && now;
   const prahar = ready ? getPraharWindow(time, now) : null;
-  const brahma = ready ? getBrahmaMuhurta(now, location) : null;
   const moonEvents = ready ? getMoonriseMoonset(now, location) : null;
   const info = selected !== null ? getMuhurtaByIndex(selected) : null;
   const window = ready && selected !== null ? getMuhurtaWindow(time, selected) : null;
@@ -229,14 +227,6 @@ function Today() {
                 </span>
               </div>
             </div>
-            {brahma && (
-              <div className="brahma-window">
-                <span>Brahma muhūrta · second-last seasonal night muhūrta before sunrise</span>
-                <strong>
-                  {clock(brahma.start)} – {clock(brahma.end)}
-                </strong>
-              </div>
-            )}
             <button
               className="next-moment"
               onClick={() =>
@@ -408,7 +398,6 @@ function Today() {
                         </small>
                       </span>
                       {active && <span className="now-badge">NOW</span>}
-                      {m.index === 29 && <span className="now-badge brahma-badge">BRAHMA</span>}
                       <ChevronRight size={15} />
                     </button>
                   );
@@ -560,8 +549,8 @@ function Today() {
               is 24 seconds; one vipala is 0.4 seconds. The count starts at local sunrise.
             </p>
             <p className="helper-text">
-              The dial uses seasonal muhūrtas. A fixed muhūrta is 48 minutes; a seasonal one is one
-              fifteenth of daylight or night. These are distinct conventions.
+              The dial divides daylight and night separately into fifteen muhūrtas, so each window
+              changes length with the season.
             </p>
           </>
         )}
