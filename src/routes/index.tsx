@@ -101,6 +101,21 @@ function Today() {
       <div className="today-heading">
         <div>
           <p className="eyebrow">{date}</p>
+          <p className="calendar-context" aria-label="Lunar month and season">
+            {panchanga ? (
+              <>
+                {panchanga.lunarMonth} Māsa
+                {preferences.showSanskrit && <span lang="sa"> · मास</span>}
+                <span aria-hidden="true"> · </span>
+                {panchanga.ritu} Ṛtu
+                {preferences.showSanskrit && <span lang="sa"> · ऋतु</span>}
+              </>
+            ) : lunarError ? (
+              "Lunar month unavailable"
+            ) : (
+              "Reading lunar month…"
+            )}
+          </p>
           <h1>
             Be in the <em>present.</em>
           </h1>
@@ -586,6 +601,8 @@ function Today() {
             ) : (
               <dl className="panchanga-list">
                 {[
+                  ["Māsa", "मास", "Lunar month", panchanga?.lunarMonth],
+                  ["Ṛtu", "ऋतु", "Season", panchanga?.ritu],
                   ["Tithi", "तिथि", "Lunar day", panchanga?.tithi],
                   ["Vāra", "वार", "Solar weekday", panchanga?.vara],
                   ["Nakṣatra", "नक्षत्र", "Lunar mansion", panchanga?.nakshatra],

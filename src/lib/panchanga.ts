@@ -12,6 +12,8 @@ export type DayBoundary = "local-sunrise";
 
 export interface Panchanga {
   readonly isProvisional: boolean;
+  readonly lunarMonth: string;
+  readonly ritu: string;
   readonly vara: string;
   readonly tithi: string;
   /** Completion of the active Tithi, expressed as a percentage. */
@@ -53,6 +55,8 @@ export interface PanchangaProvider {
 
 const DEFAULT_PANCHANGA: Panchanga = Object.freeze({
   isProvisional: true,
+  lunarMonth: "—",
+  ritu: "—",
   vara: "—",
   tithi: "Loading…",
   tithiProgress: null,
@@ -72,7 +76,12 @@ export function getInitialPanchanga(vedicTime: VedicTime): Panchanga {
 export class HoraPanchangaProvider implements PanchangaProvider {
   private dailyCache = new Map<
     string,
-    { daily: HoraPanchanga; following: HoraPanchanga; timeline: TimelineSegment[] }
+    {
+      daily: HoraPanchanga;
+      following: HoraPanchanga;
+      timeline: TimelineSegment[];
+      lunarMonth: string;
+    }
   >();
   private calculatorPromise: Promise<PanchangaCalculator> | undefined;
   private createCalculator: () => Promise<PanchangaCalculator>;
@@ -103,17 +112,19 @@ export class HoraPanchangaProvider implements PanchangaProvider {
     const cacheKey = JSON.stringify([anchorDate, location]);
     let cached = this.dailyCache.get(cacheKey);
     if (!cached) {
+      const daily = calculator.calculate(anchorDate, location, { riseSetMethod: "swiss" });
       cached = {
-        daily: calculator.calculate(anchorDate, location, { riseSetMethod: "swiss" }),
+        daily,
         following: calculator.calculate(shiftCivilDate(anchorDate, 1), location, {
           riseSetMethod: "swiss",
         }),
         timeline: calculator.timeline(anchorDate, location, { riseSetMethod: "swiss" }),
+        lunarMonth: getLunarMonthForDate(calculator, anchorDate, location, daily.lunarMonth),
       };
       if (this.dailyCache.size > 8) this.dailyCache.clear();
       this.dailyCache.set(cacheKey, cached);
     }
-    const { daily, following, timeline } = cached;
+    const { daily, following, timeline, lunarMonth } = cached;
     const active = timeline.filter(
       (segment) => segment.start <= request.instantUtc && request.instantUtc < segment.end,
     );
@@ -143,6 +154,8 @@ export class HoraPanchangaProvider implements PanchangaProvider {
 
     return Object.freeze({
       isProvisional: false,
+      lunarMonth: formatLunarMonth(lunarMonth),
+      ritu: getRitu(lunarMonth),
       vara: daily.vara.name,
       key: makeSnapshotKey(request),
       tithi: `${(activeTithi?.index ?? daily.tithi.index) < 15 ? "Śukla" : "Kṛṣṇa"} ${TITHI_NAMES[(activeTithi?.index ?? daily.tithi.index) % 15] === "Pūrṇimā" && (activeTithi?.index ?? daily.tithi.index) >= 15 ? "Amāvasyā" : TITHI_NAMES[(activeTithi?.index ?? daily.tithi.index) % 15]}`,
@@ -222,6 +235,30 @@ function sameCivilDate(left: CivilDate, right: CivilDate): boolean {
   return left.year === right.year && left.month === right.month && left.day === right.day;
 }
 
+function getLunarMonthForDate(
+  calculator: PanchangaCalculator,
+  date: CivilDate,
+  location: Location,
+  fallback: string,
+): string {
+  const monthMidpoint = { ...date, day: 15 };
+  for (const offset of [-31, 0, 31]) {
+    try {
+      const range = calculator.lunarMonthRange(
+        shiftCivilDate(monthMidpoint, offset),
+        location,
+        "amanta",
+      );
+      if (range.dates.some((rangeDate) => sameCivilDate(rangeDate, date))) {
+        return calculator.calculate(range.start, location, { riseSetMethod: "swiss" }).lunarMonth;
+      }
+    } catch {
+      // Try the adjacent Gregorian month ranges before using the daily fallback.
+    }
+  }
+  return fallback;
+}
+
 function makeSnapshotKey(request: PanchangaRequest): string {
   return [
     request.instantUtc.toISOString(),
@@ -239,6 +276,44 @@ function getPrahar(time: VedicTime): string {
     Math.floor(((time.muhurtaIndex - 1 + time.muhurtaProgress) / 15) * 4) + 1,
   );
   return `${time.period === "day" ? "Day" : "Night"} Prahar ${quarter}`;
+}
+
+const LUNAR_MONTH_LABELS: Readonly<Record<string, string>> = {
+  Chaitra: "Caitra",
+  Vaishakha: "Vaiśākha",
+  Jyeshtha: "Jyeṣṭha",
+  Ashadha: "Āṣāḍha",
+  Shravana: "Śrāvaṇa",
+  Bhadrapada: "Bhādrapada",
+  Ashvina: "Āśvina",
+  Karttika: "Kārttika",
+  Margashirsha: "Mārgaśīrṣa",
+  Pausha: "Pauṣa",
+  Magha: "Māgha",
+  Phalguna: "Phālguna",
+};
+
+const RITU_BY_LUNAR_MONTH: Readonly<Record<string, string>> = {
+  Chaitra: "Vasanta",
+  Vaishakha: "Vasanta",
+  Jyeshtha: "Grīṣma",
+  Ashadha: "Grīṣma",
+  Shravana: "Varṣā",
+  Bhadrapada: "Varṣā",
+  Ashvina: "Śarad",
+  Karttika: "Śarad",
+  Margashirsha: "Hemanta",
+  Pausha: "Hemanta",
+  Magha: "Śiśira",
+  Phalguna: "Śiśira",
+};
+
+function formatLunarMonth(month: string): string {
+  return LUNAR_MONTH_LABELS[month] ?? month;
+}
+
+function getRitu(month: string): string {
+  return RITU_BY_LUNAR_MONTH[month] ?? "—";
 }
 
 const TITHI_NAMES = [

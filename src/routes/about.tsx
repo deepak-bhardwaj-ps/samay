@@ -80,7 +80,8 @@ function AboutPage() {
         <p>
           Tithi (तिथि), nakṣatra (नक्षत्र), yoga (योग) and karaṇa (करण) are calculated with Swiss
           Ephemeris through the Hora library, using Lahiri ayanāṃśa and an offline ephemeris
-          fallback. Vāra follows the local sunrise. Solar and lunar rise/set events use SunCalc.
+          fallback. Vāra follows local sunrise; māsa uses Amānta new-moon ranges, and ṛtu groups the
+          māsa into its traditional two-month season. Solar and lunar rise/set events use SunCalc.
           Small boundary differences between calculation methods are possible.
         </p>
         <p>

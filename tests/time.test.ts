@@ -139,4 +139,24 @@ test("lunar adapter fixes shifted waning names and does not mistake sunrise clip
   assert.equal(second.tithiValidUntil!.getTime(), nextDaily.tithi.endsAt.getTime());
   assert.notEqual(second.tithiValidUntil!.getTime(), nextDaily.sunrise.getTime());
   assert.equal(second.tithiProgress, null);
+
+  const sharadInstant = new Date("2026-10-11T08:00:00Z");
+  const sharadDay = await getPanchanga(
+    sharadInstant,
+    getVedicTime(sharadInstant, delhi),
+    delhi,
+    provider,
+  );
+  assert.equal(sharadDay.lunarMonth, "Āśvina");
+  assert.equal(sharadDay.ritu, "Śarad");
+
+  const postIngressInstant = new Date("2026-10-17T08:00:00Z");
+  const postIngressDay = await getPanchanga(
+    postIngressInstant,
+    getVedicTime(postIngressInstant, delhi),
+    delhi,
+    provider,
+  );
+  assert.equal(postIngressDay.lunarMonth, "Āśvina");
+  assert.equal(postIngressDay.ritu, "Śarad");
 });

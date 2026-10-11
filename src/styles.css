@@ -303,6 +303,17 @@
   line-height: 1.7;
   color: #7a806f;
 }
+.calendar-context {
+  margin-top: 2px;
+  color: #68765e;
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.25;
+}
+.calendar-context span[lang="sa"] {
+  font-family: "Tiro Devanagari Sanskrit", serif;
+  font-size: 0.78em;
+}
 .today-heading h1 {
   font-size: 44px;
   letter-spacing: -1.25px;
@@ -1574,6 +1585,9 @@
   .today-heading .eyebrow {
     font-size: 8px;
     letter-spacing: 0.12em;
+  }
+  .calendar-context {
+    font-size: 16px;
   }
   .location-link {
     min-height: 35px;
